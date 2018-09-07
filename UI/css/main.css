@@ -1,0 +1,129 @@
+.header {
+    background: #292929;
+    color: #ffffff;
+    text-align: left;
+    padding: 24px;
+}
+
+.header a {
+    text-decoration: none;
+    color: white;
+}
+
+.flex-container-left {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.flex-container-center {
+    display: flex;
+    justify-content: center;
+}
+
+.nav-links {
+    padding: 32px;
+    display: inline;
+}
+
+.nav-links a {
+    margin-left: 2px;
+    margin-right: 2px;
+}
+
+.nav-links a:hover {
+    color: #1b91ff;
+}
+
+.nav-links a.selected {
+    color: #1b91ff;
+}
+
+.centered-div {
+    width: 60%;
+    /*height: 100%;*/
+    background-color: white;
+    /*position: absolute;*/
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+}
+
+.user-input-form input[type=text], input[type=email], input[type=password] {
+    margin: 8px;
+    padding: 3px;
+    width: 280px;
+    /*line-height: 24px;*/
+    font: 1.1em "handwriting", sans-serif;
+
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.user-input-form select {
+    margin: 8px;
+    padding: 3px;
+    width: 72px;
+    /*line-height: 24px;*/
+    font: 1em "handwriting", sans-serif;
+
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.user-input-form input[type=submit] {
+    margin: 8px;
+    width: 96px;
+    padding: 2px;
+    font: 1em sans-serif;
+
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+a.negative-link {
+    color: #ff524e;
+}
+
+a.positive-link {
+    color: #17813f;
+}
+
+#adminOrders {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: sans-serif;
+}
+
+#adminOrders td, #adminOrders th {
+    border: 1px solid #cccccc;
+    padding: 5px;
+}
+
+#adminOrders tr:nth-child(even) {
+    background-color: #dddddd;
+}
+
+#adminOrders tr:hover {
+    background-color: #aaaaaa;
+}
+
+#adminOrders th {
+    background-color: #292929;
+    padding: 5px 3px 5px 3px;
+    color: white;
+}
+
+.footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background: #292929;
+    padding: 10px;
+    color: white;
+}
