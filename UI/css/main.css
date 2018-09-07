@@ -93,29 +93,65 @@ a.positive-link {
     color: #17813f;
 }
 
-#adminOrders {
+#orders {
     width: 100%;
     border-collapse: collapse;
     font-family: sans-serif;
 }
 
-#adminOrders td, #adminOrders th {
+#orders td, #orders th {
     border: 1px solid #cccccc;
     padding: 5px;
 }
 
-#adminOrders tr:nth-child(even) {
+#orders tr:nth-child(even) {
     background-color: #dddddd;
 }
 
-#adminOrders tr:hover {
+#orders tr:hover {
     background-color: #aaaaaa;
 }
 
-#adminOrders th {
+#orders th {
     background-color: #292929;
     padding: 5px 3px 5px 3px;
     color: white;
+}
+
+#menu {
+    width: 60%;
+    border-collapse: collapse;
+    font-family: sans-serif;
+}
+
+#menu td, #menu th {
+    border: 1px solid #cccccc;
+    padding: 5px;
+}
+
+#menu tr:nth-child(even) {
+    background-color: #dddddd;
+}
+
+#menu th {
+    background-color: #292929;
+    padding: 5px 3px 5px 3px;
+    color: white;
+}
+
+#submitSection {
+    width: 40%;
+}
+
+#submitSection input[type=submit] {
+    margin-left: 8px;
+    width: 130px;
+    padding: 3px;
+    font: 1em sans-serif;
+
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 .footer {
