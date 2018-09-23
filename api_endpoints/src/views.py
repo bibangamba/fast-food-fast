@@ -18,11 +18,20 @@ def place_new_order():
     """
     place new  order function
     """
+    print("############# ", request, " #############")
+    # request_data = request.json
     request_data = request.values
+    print("############# ", request_data, " #############")
 
     #validate all parameters are in the request object
-    if "customer_name" not in request_data and "customer_phone" not in request_data and "customer_order" not in request_data:
-        return custom_response({"error": "Missing required parameter(s). Required: customer_name, customer_phone, customer_order"}, 400)
+    # if "customer_name" not in request_data and "customer_phone" not in request_data and "customer_order" not in request_data:
+    #     return custom_response({"error": "Missing required parameter(s). Required: customer_name, customer_phone, customer_order"}, 400)
+    if not request_data.get('customer_name'):
+        return custom_response({"error": "Missing customer_name parameter. List of required: customer_name, customer_phone, customer_order"}, 400)
+    if not request_data.get('customer_phone'):
+        return custom_response({"error": "Missing customer_phone parameter. List of required: customer_name, customer_phone, customer_order"}, 400)
+    if not request_data.get('customer_order'):
+        return custom_response({"error": "Missing customer_order parameter. List of required: customer_name, customer_phone, customer_order"}, 400)
 
     #validate that param values are not empty
     customer_name = request_data.get('customer_name')
@@ -122,7 +131,6 @@ def get_order(order_id):
     return custom_response(order, 200)
 
 
-
 @order_api.route('/<int:order_id>', methods=['PUT'])
 def change_order_status(order_id):
     """
@@ -137,8 +145,8 @@ def change_order_status(order_id):
 
     order = OrderModel.update_order_status(order_id, new_order_status)
     if not order:
-        return custom_response({"error": "No order found with id: %d" % order_id}, 404)
-    return custom_response({"success": "Order status was changed successfully!", "order": order}, 200)
+        return custom_response({"error": "No order found with id: {}".format(order_id)}, 404)
+    return custom_response({"success": "Order status was changed successfully!", "order": order}, 201)
 
 
 def custom_response(res, status_code):

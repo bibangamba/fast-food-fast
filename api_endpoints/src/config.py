@@ -18,8 +18,15 @@ class Production(object):
     DEBUG = False
     TESTING = False
 
+class Testing(object):
+    """
+    DEV environment config
+    """
+    TESTING = True
+
 
 app_config = {
     'development': Development,
     'production': Production,
+    'testing': Testing
 }
