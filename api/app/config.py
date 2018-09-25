@@ -1,4 +1,4 @@
-# /src/config.py
+# /app/config.py
 
 import os
 
@@ -17,6 +17,7 @@ class Production(object):
     """
     DEBUG = False
     TESTING = False
+
 
 class Testing(object):
     """

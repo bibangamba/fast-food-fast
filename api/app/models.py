@@ -1,4 +1,4 @@
-# src/model.py
+# app/model.py
 import datetime
 from flask import json
 

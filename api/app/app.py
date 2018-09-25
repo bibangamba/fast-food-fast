@@ -1,4 +1,4 @@
-#src/app.py
+#app/app.py
 
 from flask import Flask
 
@@ -16,11 +16,4 @@ def create_app(env_name):
 
     app.register_blueprint(order_blueprint, url_prefix='/api/v1/orders/')
     
-    # @app.route('/', methods=['GET'])
-    # def index():
-    #     """
-    #     sample endpoint
-    #     """
-    #     return "Hello world from an api endpoint!"
-
     return app

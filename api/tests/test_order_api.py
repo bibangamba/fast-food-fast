@@ -1,15 +1,16 @@
+#test/test_order_api
+
 import unittest
 import os
 import json
 
-from .app import create_app
-
+from app.app import create_app
 
 class OrderTest(unittest.TestCase):
     """
     order api endpoints TestCase
     """
-
+ 
     def setUp(self):
         """
         Test setup
@@ -253,3 +254,5 @@ class OrderTest(unittest.TestCase):
         json_res_data = json.loads(res.data)
         self.assertEqual(json_res_data.get('error'), "No order found with id: 55")
         self.assertEqual(res.status_code, 404)
+
+    #todo: add teardown function to stop functions sharing created orders

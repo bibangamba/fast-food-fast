@@ -1,4 +1,4 @@
-#src/views.py
+#app/views.py
 
 from flask import request, json, jsonify, Response, Blueprint
 #request contains inf from user i.e. headers, body etc
