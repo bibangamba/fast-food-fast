@@ -1,10 +1,6 @@
 #app/views.py
 
 from flask import request, json, jsonify, Response, Blueprint
-#request contains inf from user i.e. headers, body etc
-#json - to serialize JSON output
-#Response - to build response object
-#Blueprint - used to group order resources together i.e. order_api
 from .models import OrderModel
 
 import ast
@@ -18,14 +14,8 @@ def place_new_order():
     """
     place new  order function
     """
-    print("############# ", request, " #############")
-    # request_data = request.json
     request_data = request.values
-    print("############# ", request_data, " #############")
 
-    #validate all parameters are in the request object
-    # if "customer_name" not in request_data and "customer_phone" not in request_data and "customer_order" not in request_data:
-    #     return custom_response({"error": "Missing required parameter(s). Required: customer_name, customer_phone, customer_order"}, 400)
     if not request_data.get('customer_name'):
         return custom_response({"error": "Missing customer_name parameter. List of required: customer_name, customer_phone, customer_order"}, 400)
     if not request_data.get('customer_phone'):
@@ -47,13 +37,11 @@ def place_new_order():
     # convert stringified array back into a literal
     customer_orders = ast.literal_eval(request_data.get('customer_order'))
 
-    # print("#################### customer_orders:", customer_orders, " ####################")
 
     customer_order_format = "[{'food': 'grasshopper pizza', 'price': 20000, 'quantity': 2}, {'food': 'rice and beans pizza', 'price': 12000, 'quantity': 1}]"
 
     #validate customer order has food, price, and quantity fields
     for order_cust in customer_orders:
-        # print("#################### ", order_cust, " ####################")
         if 'food' not in order_cust:
             return custom_response({"error": "Badly foramtted customer_order. Missing 'food' field in {}. correct format example for 'customer_order' is: {}".format(order_cust, customer_order_format)}, 400)
         if 'price' not in order_cust:
@@ -84,19 +72,17 @@ def place_new_order():
         else:
                 return custom_response({"error": "customer_order['price'] value must an integer. found in {}".format(customer_order)}, 400)
 
-    # print("################## ", request_data.get('customer_name'), " ##################")
 
     # created new data object because request_data is immutable (couldn't change customer_order from string to array )
     data = {}
     data['customer_name'] = customer_name
     data['customer_phone'] = customer_phone
-    # literal array from stroing version passed in
+    # literal array from string version passed in
     data['customer_order'] = customer_orders
     order = OrderModel(data).to_dictionary()
     # order = OrderModel(request_data).to_dictionary()
 
     if not order:
-        # print("#############", order, "#############")
         return custom_response({"error": "Failed to save order. Conversion to dict returned None"}, 500)
 
     OrderModel.place_order(order)
@@ -111,12 +97,8 @@ def get_all_orders():
     """
     orders = OrderModel.get_all_orders()
     if len(orders) == 0:
-        # print("########### Found no orders ###########")
-        # status_code 204 returns no content. info message won't be shown
         return custom_response({"info": "No orders placed yet"}, 200)
-    # print(orders)
     return custom_response(orders, 200)
-    # return Response(mimetype='application/json', response=json.dumps(orders), status=200)
 
 
 @order_api.route('/<int:order_id>', methods=['GET'])
@@ -137,7 +119,6 @@ def change_order_status(order_id):
     get specific order function
     """
     new_order_status = request.values.get('status')
-    # print("############### ", new_order_status, " ################")
     if not new_order_status:
         return custom_response({"error": "'status' parameter not supplied"}, 400)
     if not isinstance(new_order_status, str):

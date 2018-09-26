@@ -8,35 +8,19 @@ class OrderModel():
     Order Model
     """
     orders = []
-    #testing orders list
-    # orders = [
-    #     {
-    #         "id": 2,
-    #         "customer_name": "andrew",
-    #         "customer_phone": "0782930481",
-    #         "customer_order": [
-    #             {"food": "grasshopper pizza",
-    #              "quantity": 2, "price": 20000},
-    #             {"food": "rice and beans pizza",
-    #              "quantity": 1, "price": 12000}
-    #         ],
-    #         "order_status": "pending"
-    #     }
-    # ]
 
     def __init__(self, data):
         """
-        constructor
-        data consists of ->
-        id: int
-        order_status: status
-        customer_name: andrew
-        customer_phone: 0782930481
-        customer_order: [{
-                'food':'grasshopper pizza', 
-                'quantity':'2', 
-                'price':'20000'
-            }]
+        order example ->
+            id: int
+            order_status: status
+            customer_name: andrew
+            customer_phone: 0782930481
+            customer_order: [{
+                    'food':'grasshopper pizza', 
+                    'quantity':'2', 
+                    'price':'20000'
+                }]
         """
 
         self.id = len(self.orders)+1

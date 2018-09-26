@@ -5,12 +5,14 @@ import os
 import json
 
 from app.app import create_app
+from app.models import OrderModel
+
 
 class OrderTest(unittest.TestCase):
     """
     order api endpoints TestCase
     """
- 
+
     def setUp(self):
         """
         Test setup
@@ -48,15 +50,16 @@ class OrderTest(unittest.TestCase):
                                              'price': 12000,
                                              'quantity': 1}]
 
+    def post(self, data):
+        return self.client().post(self.URL, data=data)  # return response from post
+
     #ORDER SAVING
     def test_place_order_with_correct_data(self):
         """
         test saving an order with correct data
         """
-        res = self.client().post(self.URL,
-                                 data=dict(customer_name='andrew',
-                                           customer_phone='0782930481',
-                                           customer_order=str(self.cust_order)))
+        res = self.post(dict(customer_name='andrew',
+                             customer_phone='0782930481', customer_order=str(self.cust_order)))
 
         json_res_data = json.loads(res.data)
         self.assertEqual(json_res_data.get('success'),
@@ -67,10 +70,8 @@ class OrderTest(unittest.TestCase):
         """
         test saving an order with missing customer_name param
         """
-        res = self.client().post(self.URL,
-                                 data=dict(customer_phone='0782930481',
-                                           customer_order=str(self.cust_order)
-                                           ))
+        res = self.post(dict(customer_phone='0782930481',
+                             customer_order=str(self.cust_order)))
 
         json_res_data = json.loads(res.data)
         self.assertEqual(json_res_data.get(
@@ -81,9 +82,8 @@ class OrderTest(unittest.TestCase):
         """
         test saving an order with missing customer_phone param
         """
-        res = self.client().post(self.URL,
-                                 data=dict(customer_name='andrew',
-                                           customer_order=str(self.cust_order)))
+        res = self.post(dict(customer_name='andrew',
+                             customer_order=str(self.cust_order)))
 
         json_res_data = json.loads(res.data)
         self.assertEqual(json_res_data.get(
@@ -94,18 +94,9 @@ class OrderTest(unittest.TestCase):
         """
         test saving an order with missing customer_order param
         """
-        res = self.client().post(self.URL,\
-                                 #  headers={'Content-Type': 'application/json'},\
-                                 data=dict(customer_name='andrew', customer_phone='0782930481'))
-        #  data=json.dumps(self.order_no_customer_order))
-        # print("############self.order_no_customer_order ",self.order_no_customer_order," #############")
-        # print("############json.dumps ",json.dumps(self.order_no_customer_order)," #############")
+        res = self.post(dict(customer_name='andrew',
+                             customer_phone='0782930481'))
 
-        # json_data=json.loads(res.data)
-        print("############res ", res, " #############")
-        print("############res data ", res.data, " #############")
-        print("############json_res_data ",
-              json.loads(res.data), " #############")
         json_res_data = json.loads(res.data)
         self.assertEqual(json_res_data.get(
             'error'), "Missing customer_order parameter. List of required: customer_name, customer_phone, customer_order")
@@ -150,32 +141,22 @@ class OrderTest(unittest.TestCase):
         self.assertEqual(res.status_code, 400)
 
     #GET ALL ORDERS
-    # def test_get_all_orders_no_orders_saved(self):
-    #     """
-    #     test saving an order with empty customer_order param
-    #     """
-    #     res = self.client().get(self.URL)
-    #     json_res_data = json.loads(res.data)
-    #     print("############# ", json_res_data)
-    #     self.assertEquals(json_res_data.get('info'), "No orders placed yet")
-    #     self.assertEqual(res.status_code, 200)
+    def test_get_all_orders_no_orders_saved(self):
+        """
+        test saving an order with empty customer_order param
+        """
+        res = self.client().get(self.URL)
+        json_res_data = json.loads(res.data)
+
+        self.assertEqual(json_res_data.get('info'), "No orders placed yet")
+        self.assertEqual(res.status_code, 200)
 
     def test_get_all_orders(self):
         """
         test getting all orders
         """
-        self.client().post(self.URL,
-                           data=dict(customer_name='andrew',
-                                     customer_phone='0782930481',
-                                     customer_order=str(self.cust_order)))
-        self.client().post(self.URL,
-                           data=dict(customer_name='jospeh',
-                                     customer_phone='0782930481',
-                                     customer_order=str(self.cust_order)))
-        self.client().post(self.URL,
-                           data=dict(customer_name='karungi',
-                                     customer_phone='0782930481',
-                                     customer_order=str(self.cust_order)))
+        self.post_sample_orders()
+
         res = self.client().get(self.URL)
         self.assertEqual(res.status_code, 200)
 
@@ -184,20 +165,8 @@ class OrderTest(unittest.TestCase):
         """
         test get specific order using order id
         """
-        self.client().post(self.URL,
-                           data=dict(customer_name='andrew',
-                                     customer_phone='0782930481',
-                                     customer_order=str(self.cust_order)))
-        self.client().post(self.URL,
-                           data=dict(customer_name='jospeh',
-                                     customer_phone='0782930481',
-                                     customer_order=str(self.cust_order)))
-        self.client().post(self.URL,
-                           data=dict(customer_name='karungi',
-                                     customer_phone='0782930481',
-                                     customer_order=str(self.cust_order)))
+        self.post_sample_orders()
 
-        # res = self.client().get('{}{}'.format(self.URL, 3))
         res = self.client().get(self.URL+'3')
         self.assertEqual(res.status_code, 200)
 
@@ -205,22 +174,12 @@ class OrderTest(unittest.TestCase):
         """
         test get specific order fail using order id
         """
-        self.client().post(self.URL,
-                           data=dict(customer_name='andrew',
-                                     customer_phone='0782930481',
-                                     customer_order=str(self.cust_order)))
-        self.client().post(self.URL,
-                           data=dict(customer_name='jospeh',
-                                     customer_phone='0782930481',
-                                     customer_order=str(self.cust_order)))
-        self.client().post(self.URL,
-                           data=dict(customer_name='karungi',
-                                     customer_phone='0782930481',
-                                     customer_order=str(self.cust_order)))
+        self.post_sample_orders()
 
         res = self.client().get(self.URL+'23')
         json_res_data = json.loads(res.data)
-        self.assertEqual(json_res_data.get('error'), "No order found with id: 23")
+        self.assertEqual(json_res_data.get('error'),
+                         "No order found with id: 23")
         self.assertEqual(res.status_code, 404)
 
     #STATUS UPDATE
@@ -228,6 +187,15 @@ class OrderTest(unittest.TestCase):
         """
         test update order_status successfully
         """
+        self.post_sample_orders()
+
+        res = self.client().put(self.URL+'2', data=dict(status='accepted'))
+        json_res_data = json.loads(res.data)
+        self.assertEqual(json_res_data.get('success'),
+                         "Order status was changed successfully!")
+        self.assertEqual(res.status_code, 201)
+
+    def post_sample_orders(self):
         self.client().post(self.URL,
                            data=dict(customer_name='andrew',
                                      customer_phone='0782930481',
@@ -241,18 +209,9 @@ class OrderTest(unittest.TestCase):
                                      customer_phone='0782930481',
                                      customer_order=str(self.cust_order)))
 
-        res = self.client().put(self.URL+'2', data=dict(status='accepted'))
-        json_res_data = json.loads(res.data)
-        self.assertEqual(json_res_data.get('success'), "Order status was changed successfully!")
-        self.assertEqual(res.status_code, 201)
-    
-    def test_fail_update_order_status(self):
+    def tearDown(self):
         """
-        test update order_status rejection
+        Tear Down method used to reset orders variable
         """
-        res = self.client().put(self.URL+'55', data=dict(status='accepted'))
-        json_res_data = json.loads(res.data)
-        self.assertEqual(json_res_data.get('error'), "No order found with id: 55")
-        self.assertEqual(res.status_code, 404)
-
-    #todo: add teardown function to stop functions sharing created orders
+        with self.app.app_context():
+            OrderModel.orders = []
