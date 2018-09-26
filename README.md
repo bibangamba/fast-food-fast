@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/bibangamba/fast-food-fast.svg?branch=api-v1)](https://travis-ci.org/bibangamba/fast-food-fast)
-[![Coverage Status](https://coveralls.io/repos/github/bibangamba/fast-food-fast/badge.svg?branch=ft-api-end-points)](https://coveralls.io/github/bibangamba/fast-food-fast?branch=ft-api-end-points)
+[![Coverage Status](https://coveralls.io/repos/github/bibangamba/fast-food-fast/badge.svg?branch=api_v1)](https://coveralls.io/github/bibangamba/fast-food-fast?branch=api_v1)
 [![Maintainability](https://api.codeclimate.com/v1/badges/5c4fade3616fe64f7994/maintainability)](https://codeclimate.com/github/bibangamba/fast-food-fast/maintainability)
 # fast-food-fast
 Fast-Food-Fast is a food delivery service app for a restaurant
@@ -18,7 +18,7 @@ If however, you'd like to run the app on your local machine:
 3. create a virtual environment and activate it
 
     - to create: `python -m venv env-name` (windows) or `python3 -m venv env-name` (macOS)
-    - to activate: `env-name\Scripts\activate.bat` (windows) or `source env-name/bin/activate`
+    - to activate: `env-name\Scripts\activate.bat` (windows cmd. repalce `.bat` with `.ps1` for windows powershell) or `source env-name/bin/activate`
     - to deactivate: `env-name\Scripts\deactivate.bat` (windows)
 4. set FLASH_ENV to development and PORT to 5000. 
 

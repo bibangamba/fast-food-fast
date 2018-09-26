@@ -1,4 +1,4 @@
-#test/test_order_api
+#tests/test_order_api
 
 import unittest
 import os
