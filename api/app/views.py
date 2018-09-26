@@ -51,21 +51,18 @@ def place_new_order():
 
     #validate customer order values
     for customer_order in customer_orders:
-        #food
         if isinstance(customer_order.get('food'), str):
             if str(customer_order.get('food')).strip() == '':
                 return custom_response({"error": "customer_order['food'] value must be a non empty string"}, 400)
         else:
                 return custom_response({"error": "customer_order['food'] value must be a string, found in {}".format(customer_order)}, 400)
 
-        #quantity
         if isinstance(customer_order.get('quantity'), int):
             if customer_order.get('quantity') < 1:
                 return custom_response({"error": "customer_order['quantity'] value must be greater than 1. found in {}".format(customer_order)}, 400)
         else:
                 return custom_response({"error": "customer_order['quantity'] value must an integer. found in {}".format(customer_order)}, 400)
 
-        #price
         if isinstance(customer_order.get('price'), int):
             if customer_order.get('price') < 1:
                 return custom_response({"error": "customer_order['price'] value must be greater than 1. found in {}".format(customer_order)}, 400)
@@ -77,17 +74,11 @@ def place_new_order():
     data = {}
     data['customer_name'] = customer_name
     data['customer_phone'] = customer_phone
-    # literal array from string version passed in
     data['customer_order'] = customer_orders
     order = OrderModel(data).to_dictionary()
-    # order = OrderModel(request_data).to_dictionary()
-
-    if not order:
-        return custom_response({"error": "Failed to save order. Conversion to dict returned None"}, 500)
 
     OrderModel.place_order(order)
     return custom_response({"success": "Order placed successfully!", "saved_order": order}, 201)
-    # return Response(mimetype='application/json', response=json.dumps({"success": "Order placed successfully!"}), status=201)
 
 
 @order_api.route('/', methods=['GET'])
