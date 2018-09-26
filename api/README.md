@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/bibangamba/fast-food-fast.svg?branch=ft-api-end-points)](https://travis-ci.org/bibangamba/fast-food-fast)
+[![Build Status](https://travis-ci.org/bibangamba/fast-food-fast.svg?branch=api-v1)](https://travis-ci.org/bibangamba/fast-food-fast)
 [![Coverage Status](https://coveralls.io/repos/github/bibangamba/fast-food-fast/badge.svg?branch=ft-api-end-points)](https://coveralls.io/github/bibangamba/fast-food-fast?branch=ft-api-end-points)
 [![Maintainability](https://api.codeclimate.com/v1/badges/5c4fade3616fe64f7994/maintainability)](https://codeclimate.com/github/bibangamba/fast-food-fast/maintainability)
 # fast-food-fast
@@ -29,7 +29,7 @@ If however, you'd like to run the app on your local machine:
 
 #### Working with the endpoints
 |Endpoint                       |Method |Action                                     |Parameters                                     |
-|:---:                          |:---:  |:---:                                      |:--:                                           |
+|:---                           |:---   |:---                                       |:--                                            |
 |/api/v1/orders/                |GET    |get a list of all orders                   |N/A                                            |
 |/api/v1/orders/int:order_id    |GET    |get a specific order whose id = order_id   |order_id                                       |
 |/api/v1/orders/                |POST   |place an order                             |customer_name, customer_order, customer_contact|
