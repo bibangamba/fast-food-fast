@@ -15,62 +15,74 @@ def place_new_order():
     place new  order function
     """
     request_data = request.values
-    request_json = request.json()
-    print("################### ", request_json)
+    request_json = request.json
+    print("################### request_json: ", request_json)
+    json_response_message = {}
 
-    if not request_data.get('customer_name'):
-        return custom_response({"error": "Missing customer_name parameter. List of required: customer_name, customer_phone, customer_order"}, 400)
-    if not request_data.get('customer_phone'):
-        return custom_response({"error": "Missing customer_phone parameter. List of required: customer_name, customer_phone, customer_order"}, 400)
-    if not request_data.get('customer_order'):
-        return custom_response({"error": "Missing customer_order parameter. List of required: customer_name, customer_phone, customer_order"}, 400)
+    def validate_request_data_contains_valid_parameters(parameter_key):
+        if not request_data.get(parameter_key):
+            json_response_message['message'] = {"error": "Missing " + parameter_key + " parameter. List of required: customer_name, customer_phone, customer_order"}
+            json_response_message['status_code'] = 400
 
-    #validate that param values are not empty
+        else:
+            # going to change to request_json
+            parameter = request_data.get(parameter_key)
+            if parameter.strip() == '':
+                json_response_message['message'] = {
+                    "error": "{} cannot be empty".format(parameter_key)}
+                json_response_message['status_code'] = 400
+
+        
+
+    def validate_customer_order_content_and_values(order, content_key, content_type):
+        json_response_message = {}
+        if content_key not in order:
+            json_response_message['message'] = {"error": "Badly foramtted customer_order. Missing "+content_key +
+                                             " field in {}. correct format example for 'customer_order' is: {}".format(order, customer_order_format)}
+            json_response_message['status_code'] = 400
+        else:
+            if content_type == 'str':
+                if isinstance(order.get(content_key), str):
+                    if str(order.get(content_key)).strip() == '':
+                        json_response_message['message'] = {
+                            "error": "customer_order["+content_key+"] value must be a non empty string"}
+                        json_response_message['status_code'] = 400
+                else:
+                    json_response_message['message'] = {
+                        "error": "customer_order["+content_key+"] value must be a string, found in {}".format(order)}
+                    json_response_message['status_code'] = 400
+            elif content_type == 'int':
+                if isinstance(order.get(content_key), int):
+                    if order.get(content_key) < 1:
+                        json_response_message['message'] = {
+                            "error": "customer_order[{}] value must be greater than 1, found in {}".format(content_key, order)}
+                        json_response_message['status_code'] = 400
+                else:
+                        json_response_message['message'] = {
+                            "error": "customer_order[{}] value must be an integer. found in {}".format(content_key, order)}
+                        json_response_message['status_code'] = 400
+
+        if len(json_response_message) > 0:
+            return custom_response(json_response_message.get('message'), json_response_message.get('status_code'))
+
+    validate_request_data_contains_valid_parameters('customer_name')
+    validate_request_data_contains_valid_parameters('customer_phone')
+    validate_request_data_contains_valid_parameters('customer_order')
+    if len(json_response_message) > 0:
+        return custom_response(json_response_message.get('message'), json_response_message.get('status_code'))
+
     customer_name = request_data.get('customer_name')
-    if customer_name.strip() == '':
-        return custom_response({"error": "customer_name must be a non empty string"}, 400)
     customer_phone = request_data.get('customer_phone')
-    if customer_phone.strip() == '':
-        return custom_response({"error": "customer_phone must not be empty"}, 400)
-    customer_order = request_data.get('customer_order')
-    if customer_order.strip() == '':
-        return custom_response({"error": "customer_order cannot be empty"}, 400)
-
     # convert stringified array back into a literal
     customer_orders = ast.literal_eval(request_data.get('customer_order'))
-
 
     customer_order_format = "[{'food': 'grasshopper pizza', 'price': 20000, 'quantity': 2}, {'food': 'rice and beans pizza', 'price': 12000, 'quantity': 1}]"
 
     #validate customer order has food, price, and quantity fields
-    for order_cust in customer_orders:
-        if 'food' not in order_cust:
-            return custom_response({"error": "Badly foramtted customer_order. Missing 'food' field in {}. correct format example for 'customer_order' is: {}".format(order_cust, customer_order_format)}, 400)
-        if 'price' not in order_cust:
-            return custom_response({"error": "Badly foramtted customer_order. Missing 'price' field in {}. correct format example for 'customer_order' is: {}".format(order_cust, customer_order_format)}, 400)
-        if 'quantity' not in order_cust:
-            return custom_response({"error": "Badly foramtted customer_order. Missing 'quantity' field in {}.. correct format example for 'customer_order' is: {}".format(order_cust, customer_order_format)}, 400)
-
-    #validate customer order values
-    for customer_order in customer_orders:
-        if isinstance(customer_order.get('food'), str):
-            if str(customer_order.get('food')).strip() == '':
-                return custom_response({"error": "customer_order['food'] value must be a non empty string"}, 400)
-        else:
-                return custom_response({"error": "customer_order['food'] value must be a string, found in {}".format(customer_order)}, 400)
-
-        if isinstance(customer_order.get('quantity'), int):
-            if customer_order.get('quantity') < 1:
-                return custom_response({"error": "customer_order['quantity'] value must be greater than 1. found in {}".format(customer_order)}, 400)
-        else:
-                return custom_response({"error": "customer_order['quantity'] value must an integer. found in {}".format(customer_order)}, 400)
-
-        if isinstance(customer_order.get('price'), int):
-            if customer_order.get('price') < 1:
-                return custom_response({"error": "customer_order['price'] value must be greater than 1. found in {}".format(customer_order)}, 400)
-        else:
-                return custom_response({"error": "customer_order['price'] value must an integer. found in {}".format(customer_order)}, 400)
-
+    for order in customer_orders:
+        validate_customer_order_content_and_values(order, 'food', 'str')
+        validate_customer_order_content_and_values(order, 'quantity', 'int')
+        validate_customer_order_content_and_values(order, 'price', 'int')
 
     # created new data object because request_data is immutable (couldn't change customer_order from string to array )
     data = {}

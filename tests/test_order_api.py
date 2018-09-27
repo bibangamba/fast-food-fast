@@ -112,7 +112,7 @@ class OrderTest(unittest.TestCase):
 
         json_res_data = json.loads(res.data)
         self.assertEqual(json_res_data.get('error'),
-                         "customer_name must be a non empty string")
+                         "customer_name cannot be empty")
         self.assertEqual(res.status_code, 400)
 
     def test_place_order_with_empty_customer_phone(self):
@@ -125,7 +125,7 @@ class OrderTest(unittest.TestCase):
 
         json_res_data = json.loads(res.data)
         self.assertEqual(json_res_data.get('error'),
-                         "customer_phone must not be empty")
+                         "customer_phone cannot be empty")
         self.assertEqual(res.status_code, 400)
 
     def test_place_order_with_empty_customer_order(self):
