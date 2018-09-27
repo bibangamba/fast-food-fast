@@ -15,6 +15,8 @@ def place_new_order():
     place new  order function
     """
     request_data = request.values
+    request_json = request.json()
+    print("################### ", request_json)
 
     if not request_data.get('customer_name'):
         return custom_response({"error": "Missing customer_name parameter. List of required: customer_name, customer_phone, customer_order"}, 400)
