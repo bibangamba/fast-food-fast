@@ -15,7 +15,7 @@ def place_new_order():
     place new  order function
     """
     request_data = request.values
-    request_json = request.json
+    request_json = request.get_json()
     print("################### request_json: ", request_json)
     json_response_message = {}
 

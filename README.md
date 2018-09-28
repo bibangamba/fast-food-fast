@@ -29,9 +29,9 @@ If however, you'd like to run the app on your local machine:
     - to create: `python -m venv env-name` (windows) or `python3 -m venv env-name` (macOS)
     - to activate: `env-name\Scripts\activate.bat` (windows cmd. repalce `.bat` with `.ps1` for windows powershell) or `source env-name/bin/activate`
     - to deactivate: `env-name\Scripts\deactivate.bat` (windows)
-4. set FLASH_ENV to development and PORT to 5000
+4. set FLASK_ENV to development and PORT to 5000
 
-    - `set FLASH_ENV="development"` on windows cmd (`$env:FLASH_ENV="development"` in powershell) or `export FLASH_ENV="development"`
+    - `set FLASK_ENV="development"` on windows cmd (`$env:FLASK_ENV="development"` in powershell) or `export FLASK_ENV="development"`
     - `set PORT=5000` on windows cmd (`$env:PORT=5000` in powershell) or `export PORT=5000` on macOS
 5. run `pip install -r requirements.txt` to install all the required packages
 6. run `python run.py` to start the app. you can then navigate to `localhost:5000/api/v1/orders/`
