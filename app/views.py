@@ -3,7 +3,7 @@
 from flask import request, json, jsonify, Response, Blueprint
 from .models import OrderModel
 
-import ast
+# import ast
 
 #create blueprint app
 order_api = Blueprint('order_api', __name__,)
@@ -14,31 +14,36 @@ def place_new_order():
     """
     place new  order function
     """
-    request_data = request.values
-    request_json = request.get_json()
-    print("################### request_json: ", request_json)
+    # request_data = request.values
+    request_data = request.json
+    # print("################### request_json1: ", request_json1)
+    print("################### request_data: ", request_data)
     json_response_message = {}
 
     def validate_request_data_contains_valid_parameters(parameter_key):
-        if not request_data.get(parameter_key):
-            json_response_message['message'] = {"error": "Missing " + parameter_key + " parameter. List of required: customer_name, customer_phone, customer_order"}
-            json_response_message['status_code'] = 400
-
-        else:
-            # going to change to request_json
-            parameter = request_data.get(parameter_key)
-            if parameter.strip() == '':
+        if(parameter_key == 'customer_order'):
+            if not request_data.get(parameter_key):
                 json_response_message['message'] = {
-                    "error": "{} cannot be empty".format(parameter_key)}
+                    "error": parameter_key + " is missing or empty. List of required: customer_name, customer_phone, customer_order"}
+                json_response_message['status_code'] = 400
+        else:
+            if not request_data.get(parameter_key):
+                json_response_message['message'] = {
+                    "error": "Missing " + parameter_key + " parameter. List of required: customer_name, customer_phone, customer_order"}
                 json_response_message['status_code'] = 400
 
-        
+            else:
+                parameter = request_data.get(parameter_key)
+                if parameter.strip() == '':
+                    json_response_message['message'] = {
+                        "error": "{} cannot be empty".format(parameter_key)}
+                    json_response_message['status_code'] = 400
 
     def validate_customer_order_content_and_values(order, content_key, content_type):
         json_response_message = {}
         if content_key not in order:
             json_response_message['message'] = {"error": "Badly foramtted customer_order. Missing "+content_key +
-                                             " field in {}. correct format example for 'customer_order' is: {}".format(order, customer_order_format)}
+                                                " field in {}. correct format example for 'customer_order' is: {}".format(order, customer_order_format)}
             json_response_message['status_code'] = 400
         else:
             if content_type == 'str':
@@ -71,11 +76,11 @@ def place_new_order():
     if len(json_response_message) > 0:
         return custom_response(json_response_message.get('message'), json_response_message.get('status_code'))
 
-    customer_name = request_data.get('customer_name')
-    customer_phone = request_data.get('customer_phone')
+    # customer_name = request_data.get('customer_name')
+    # customer_phone = request_data.get('customer_phone')
     # convert stringified array back into a literal
-    customer_orders = ast.literal_eval(request_data.get('customer_order'))
-
+    # customer_orders = ast.literal_eval(request_data.get('customer_order'))
+    customer_orders = request_data.get('customer_order')
     customer_order_format = "[{'food': 'grasshopper pizza', 'price': 20000, 'quantity': 2}, {'food': 'rice and beans pizza', 'price': 12000, 'quantity': 1}]"
 
     #validate customer order has food, price, and quantity fields
@@ -84,13 +89,8 @@ def place_new_order():
         validate_customer_order_content_and_values(order, 'quantity', 'int')
         validate_customer_order_content_and_values(order, 'price', 'int')
 
-    # created new data object because request_data is immutable (couldn't change customer_order from string to array )
-    data = {}
-    data['customer_name'] = customer_name
-    data['customer_phone'] = customer_phone
-    data['customer_order'] = customer_orders
-    order = OrderModel(data).to_dictionary()
-
+    order = OrderModel(request_data).to_dictionary()
+    print("################# order just before post: ", order)
     OrderModel.place_order(order)
     return custom_response({"success": "Order placed successfully!", "saved_order": order}, 201)
 
@@ -123,7 +123,7 @@ def change_order_status(order_id):
     """
     get specific order function
     """
-    new_order_status = request.values.get('status')
+    new_order_status = request.json.get('status')
     if not new_order_status:
         return custom_response({"error": "'status' parameter not supplied"}, 400)
     if not isinstance(new_order_status, str):
@@ -139,11 +139,5 @@ def custom_response(res, status_code):
     """
     custom response function
     """
-    # return Response(
-    #     mimetype='application/json',
-    #     response=json.dumps(res),
-    #     status=status_code
-    # )
-
     #use jsonify for pretty print in browser too
     return jsonify(res), status_code
