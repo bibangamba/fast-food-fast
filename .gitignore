@@ -2,6 +2,7 @@
 app/__pycache__
 tests/__pycache__
 api-env
+api
 bibangamba_fast_food_fast_api.egg-info
 build
 dist
