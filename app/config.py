@@ -9,6 +9,8 @@ class Development(object):
     """
     DEBUG = True
     TESTING = False
+    DATABASE_URI = os.getenv('DATABASE_URI')
+    JWT_SECRET = os.getenv('JWT_SECRET')
 
 
 class Production(object):
@@ -17,6 +19,8 @@ class Production(object):
     """
     DEBUG = False
     TESTING = False
+    DATABASE_URI = os.getenv('DATABASE_URI')
+    JWT_SECRET = os.getenv('JWT_SECRET')
 
 
 class Testing(object):
@@ -24,6 +28,8 @@ class Testing(object):
     DEV environment config
     """
     TESTING = True
+    DATABASE_URI = os.getenv('TEST_DATABASE_URI')
+    JWT_SECRET = os.getenv('JWT_SECRET')
 
 
 app_config = {

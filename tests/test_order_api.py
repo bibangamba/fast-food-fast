@@ -4,6 +4,8 @@ import unittest
 import os
 import json
 
+import psycopg2
+
 from app.app import create_app
 from app.models import OrderModel
 
@@ -58,8 +60,6 @@ class OrderTest(unittest.TestCase):
         """
         test saving an order with correct data
         """
-        print("################## test_request_data: ", dict(customer_name='andrew',
-                             customer_phone='0782930481', customer_order=self.cust_order))
         res = self.post(dict(customer_name='andrew',
                              customer_phone='0782930481', customer_order=self.cust_order))
 
@@ -169,7 +169,7 @@ class OrderTest(unittest.TestCase):
         """
         self.post_sample_orders()
 
-        res = self.client().get(self.URL+'3')
+        res = self.client().get(self.URL+'1')
         self.assertEqual(res.status_code, 200)
 
     def test_get_specific_order_failed(self):
@@ -178,10 +178,10 @@ class OrderTest(unittest.TestCase):
         """
         self.post_sample_orders()
 
-        res = self.client().get(self.URL+'23')
+        res = self.client().get(self.URL+'3')
         json_res_data = json.loads(res.data)
         self.assertEqual(json_res_data.get('error'),
-                         "No order found with id: 23")
+                         "No order found with id: 3")
         self.assertEqual(res.status_code, 404)
 
     #STATUS UPDATE
@@ -216,4 +216,6 @@ class OrderTest(unittest.TestCase):
         Tear Down method used to reset orders variable
         """
         with self.app.app_context():
-            OrderModel.orders = []
+            connection = psycopg2.connect(os.getenv('DATABASE_URI'))
+            cursor = connection.cursor()
+            cursor.execute("TRUNCATE TABLE orders CASCADE")

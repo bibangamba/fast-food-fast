@@ -14,10 +14,7 @@ def place_new_order():
     """
     place new  order function
     """
-    # request_data = request.values
     request_data = request.json
-    # print("################### request_json1: ", request_json1)
-    print("################### request_data: ", request_data)
     json_response_message = {}
 
     def validate_request_data_contains_valid_parameters(parameter_key):
@@ -90,7 +87,6 @@ def place_new_order():
         validate_customer_order_content_and_values(order, 'price', 'int')
 
     order = OrderModel(request_data).to_dictionary()
-    print("################# order just before post: ", order)
     OrderModel.place_order(order)
     return custom_response({"success": "Order placed successfully!", "saved_order": order}, 201)
 
@@ -115,6 +111,9 @@ def get_order(order_id):
 
     if not order:
         return custom_response({"error": "No order found with id: %d" % order_id}, 404)
+    elif order is None:
+        return custom_response({"error": "No order found with id: %d" % order_id}, 404)
+
     return custom_response(order, 200)
 
 
