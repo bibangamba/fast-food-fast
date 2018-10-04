@@ -25,7 +25,7 @@ class OrderTest(unittest.TestCase):
         self.app = create_app("testing")
         APP.config = self.app.config
         # self.db = DatabaseConnectionHelper(APP.config['DATABASE_URI'])
-        self.db = DatabaseConnectionHelper(os.environ.get('TEST_DATABASE_URI'))
+        self.db = DatabaseConnectionHelper("postgresql://postgres:bibangamba2@localhost:5432/fast-food-fast-test?application_name=bibangamba-fast-food-fast-api-v2")
         self.db.create_all_tables()
 
         self.client = self.app.test_client
