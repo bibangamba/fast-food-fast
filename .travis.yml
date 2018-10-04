@@ -11,8 +11,8 @@ install:
 
 
 script:
-    - python -m pytest --cov=app --cov-report term-missing
     - psql -c 'create database fast-food-fast-test;' -U postgres
+    - python -m pytest --cov=app --cov-report term-missing
 
 
 after_success:

@@ -9,3 +9,4 @@ bibangamba_fast_food_fast_api.egg-info
 build
 dist
 setup.py
+.env
