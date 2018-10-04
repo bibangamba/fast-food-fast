@@ -13,7 +13,7 @@ if __name__ == '__main__':
     port = os.getenv('PORT')
     app.run(host='127.0.0.1', port=port)
 
-    db = DatabaseConnectionHelper()
+    db = DatabaseConnectionHelper(APP.config['DATABASE_URI'])
     db.create_all_tables()
     # delete the instance and hence close the connection and cursor
     del db

@@ -23,9 +23,8 @@ class OrderTest(unittest.TestCase):
         Test setup
         """
         self.app = create_app("testing")
-        # print("############## tests self.app contents: ", self.app.config)
         APP.config = self.app.config
-        self.db = DatabaseConnectionHelper()
+        self.db = DatabaseConnectionHelper(APP.config['DATABASE_URI'])
         self.db.create_all_tables()
 
         self.client = self.app.test_client

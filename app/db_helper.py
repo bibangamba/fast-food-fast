@@ -12,8 +12,7 @@ class DatabaseConnectionHelper():
     """
     #initialise  connection helper with default db_url set to import from run.app (result of create_app())
 
-    def __init__(self):
-        db_url = APP.config['DATABASE_URI']
+    def __init__(self, db_url):
         self.db_url = db_url
         self.connection = psycopg2.connect(self.db_url)
         self.cursor = self.connection.cursor()

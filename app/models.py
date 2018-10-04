@@ -6,6 +6,7 @@ from psycopg2.extras import Json, DictCursor
 import datetime
 from flask import json
 from .db_helper import DatabaseConnectionHelper
+from app import APP
 
 
 #create the multiple tables needed
@@ -53,7 +54,7 @@ class OrderModel():
         """
         insert order into database
         """
-        db = DatabaseConnectionHelper()
+        db = DatabaseConnectionHelper(APP.config['DATABASE_URI'])
         order = db.insert_order_into_db(order)
         del db 
         return order
@@ -63,7 +64,7 @@ class OrderModel():
         """
         return the orders list
         """
-        db = DatabaseConnectionHelper()
+        db = DatabaseConnectionHelper(APP.config['DATABASE_URI'])
         orders = db.get_all_orders_from_db()
         del db
         return orders
@@ -75,7 +76,7 @@ class OrderModel():
         return the order if one is found
         return None if no order matched the id passed in as a parameter
         """
-        db = DatabaseConnectionHelper()
+        db = DatabaseConnectionHelper(APP.config['DATABASE_URI'])
         order = db.get_order_from_db(id)
         return order
         
@@ -88,7 +89,7 @@ class OrderModel():
         """
         order = {}
         if cls.get_specific_order(id) is not None:
-            db = DatabaseConnectionHelper()
+            db = DatabaseConnectionHelper(APP.config['DATABASE_URI'])
             updated_order = db.update_order_status_in_db(id, order_status)
             del db
             order = updated_order
