@@ -8,18 +8,26 @@ import psycopg2
 
 from app.app import create_app
 from app.models import OrderModel
+from app import APP
+from app.db_helper import DatabaseConnectionHelper
 
 
 class OrderTest(unittest.TestCase):
     """
     order api endpoints TestCase
     """
+    # APP.config['TESTING'] = True
 
     def setUp(self):
         """
         Test setup
         """
         self.app = create_app("testing")
+        # print("############## tests self.app contents: ", self.app.config)
+        APP.config = self.app.config
+        self.db = DatabaseConnectionHelper()
+        self.db.create_all_tables()
+
         self.client = self.app.test_client
 
         self.URL = '/api/v1/orders/'
@@ -178,10 +186,10 @@ class OrderTest(unittest.TestCase):
         """
         self.post_sample_orders()
 
-        res = self.client().get(self.URL+'3')
+        res = self.client().get(self.URL+'5')
         json_res_data = json.loads(res.data)
         self.assertEqual(json_res_data.get('error'),
-                         "No order found with id: 3")
+                         "No order found with id: 5")
         self.assertEqual(res.status_code, 404)
 
     #STATUS UPDATE
@@ -191,11 +199,35 @@ class OrderTest(unittest.TestCase):
         """
         self.post_sample_orders()
 
-        res = self.client().put(self.URL+'2', json=dict(status='accepted'))
+        res = self.client().put(self.URL+'1', json=dict(status='complete'))
         json_res_data = json.loads(res.data)
         self.assertEqual(json_res_data.get('success'),
                          "Order status was changed successfully!")
         self.assertEqual(res.status_code, 201)
+
+    def test_invalid_order_status_update(self):
+        """
+        test feedback when supplied status is invalid (not one of: new, processing, cancelled, or complete)
+        """
+        self.post_sample_orders()
+
+        res = self.client().put(self.URL+'2', json=dict(status='blah'))
+        json_res_data = json.loads(res.data)
+        self.assertEqual(json_res_data.get('error'),
+                         "'status' can only be one of these options: new, processing, cancelled, or complete")
+        self.assertEqual(res.status_code, 400)
+
+    def test_empty_or_no_order_status_update_supplied(self):
+        """
+        test correct feedback when status update is not supplied
+        """
+        self.post_sample_orders()
+
+        res = self.client().put(self.URL+'2', json=dict())
+        json_res_data = json.loads(res.data)
+        self.assertEqual(json_res_data.get('error'),
+                         "'status' parameter not supplied")
+        self.assertEqual(res.status_code, 400)
 
     def post_sample_orders(self):
         self.client().post(self.URL,
@@ -216,6 +248,5 @@ class OrderTest(unittest.TestCase):
         Tear Down method used to reset orders variable
         """
         with self.app.app_context():
-            connection = psycopg2.connect(os.getenv('DATABASE_URI'))
-            cursor = connection.cursor()
-            cursor.execute("TRUNCATE TABLE orders CASCADE")
+            self.db.delete_data_from_all_tables()
+            del self.db

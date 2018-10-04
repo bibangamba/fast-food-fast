@@ -2,13 +2,18 @@
 import os
 
 from app.app import create_app
+from app import APP
 
-# $env:FLASK_ENV = "development" - powershell
-# set FLASK_ENV = "development" - cmd
+from app.db_helper import DatabaseConnectionHelper
 
 env_name = os.getenv('FLASK_ENV')
 app = create_app(env_name)
-
+APP.config = app.config
 if __name__ == '__main__':
     port = os.getenv('PORT')
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='127.0.0.1', port=port)
+
+    db = DatabaseConnectionHelper()
+    db.create_all_tables()
+    # delete the instance and hence close the connection and cursor
+    del db
