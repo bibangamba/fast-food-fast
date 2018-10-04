@@ -73,10 +73,6 @@ def place_new_order():
     if len(json_response_message) > 0:
         return custom_response(json_response_message.get('message'), json_response_message.get('status_code'))
 
-    # customer_name = request_data.get('customer_name')
-    # customer_phone = request_data.get('customer_phone')
-    # convert stringified array back into a literal
-    # customer_orders = ast.literal_eval(request_data.get('customer_order'))
     customer_orders = request_data.get('customer_order')
     customer_order_format = "[{'food': 'grasshopper pizza', 'price': 20000, 'quantity': 2}, {'food': 'rice and beans pizza', 'price': 12000, 'quantity': 1}]"
 
@@ -125,8 +121,8 @@ def change_order_status(order_id):
     new_order_status = request.json.get('status')
     if not new_order_status:
         return custom_response({"error": "'status' parameter not supplied"}, 400)
-    if not isinstance(new_order_status, str):
-        return custom_response({"error": "status parameter should be a string"}, 400)
+    if new_order_status not in ['new', 'processing', 'cancelled', 'complete']:
+        return custom_response({"error": "'status' can only be one of these options: new, processing, cancelled, or complete"}, 400)
 
     order = OrderModel.update_order_status(order_id, new_order_status)
     if not order:

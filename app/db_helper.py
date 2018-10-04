@@ -58,8 +58,6 @@ class DatabaseConnectionHelper():
         self.connection.commit()
 
     def insert_order_into_db(self, order):
-        print("################# working inside insert_order_mthd")
-        print("################# db_url used to insert order: ", self.db_url)
         query = """
             INSERT INTO orders (
                 customer_name,
