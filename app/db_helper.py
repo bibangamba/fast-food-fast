@@ -191,13 +191,15 @@ class DatabaseConnectionHelper():
         menu_items = self.cursor.fetchall()
         self.connection.commit()
 
-        for menu_item in menu_items:
-            organized_menu_item = {}
-            organized_menu_item['id'] = menu_item[0]
-            organized_menu_item['food_name'] = menu_item[1]
-            organized_menu_item['price'] = menu_item[2]
-            organized_menu_item['food_description'] = menu_item[3]
-            list_of_menu_items.append(organized_menu_item)
+        if menu_items is not None:
+            for menu_item in menu_items:
+                organized_menu_item = {}
+                organized_menu_item['id'] = menu_item[0]
+                organized_menu_item['food_name'] = menu_item[1]
+                if menu_item[2] is not None:
+                    organized_menu_item['price'] = int(menu_item[2]) #convert Decimal to int since Decimal is not JSON serializable
+                organized_menu_item['food_description'] = menu_item[3]
+                list_of_menu_items.append(organized_menu_item)
         return list_of_menu_items
 
     def find_menu_item_in_db_using_id(self, menu_item_id):

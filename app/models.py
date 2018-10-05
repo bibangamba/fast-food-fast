@@ -9,17 +9,6 @@ from .db_helper import DatabaseConnectionHelper
 from app import APP
 
 
-#create the multiple tables needed
-"""
-USERS
-- email
-- name
-- phone
-- password
-- id
-"""
-
-
 class OrderModel():
     """
     Order Model

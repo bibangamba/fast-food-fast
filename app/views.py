@@ -231,17 +231,16 @@ def add_food_to_menu():
 
     return custom_response({"success": "Menu was updated with {}".format(food_name), "saved_food_item": saved_food_item}, 200)
 
-@order_api.route('menu/', methods=['GET'])
+@order_api.route('menu', methods=['GET'])
 @jwt_required
 def get_menu():
     """
-    get all orders function
+    get menu items function
     """
-    pass
-    # orders = OrderModel.get_all_orders()
-    # if len(orders) == 0:
-    #     return custom_response({"info": "No orders placed yet"}, 200)
-    # return custom_response(orders, 200)
+    menu_items = MenuModel.get_all_menu_items()
+    if len(menu_items) == 0:
+        return custom_response({"info": "Menu is currently empty. Please try again some other time, we'll have more to offer."}, 200)
+    return custom_response(menu_items, 200)
 
 def custom_response(res, status_code):
     """
