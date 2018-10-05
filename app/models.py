@@ -30,6 +30,8 @@ class OrderModel():
                     'price':'13000'}
 
                 ]
+            order_date: datetime
+            user_id: int
         """
 
         self.customer_name = data.get('customer_name')
@@ -37,6 +39,7 @@ class OrderModel():
         self.customer_order = data.get('customer_order')
         self.order_status = 'new'
         self.order_date = datetime.datetime.utcnow()
+        self.user_id = data.get('user_id')
 
     @classmethod
     def place_order(cls, order):
@@ -55,6 +58,16 @@ class OrderModel():
         """
         db = DatabaseConnectionHelper(APP.config['DATABASE_URI'])
         orders = db.get_all_orders_from_db()
+        del db
+        return orders
+
+    @classmethod
+    def get_user_order_history(cls, user_id):
+        """
+        return the orders list
+        """
+        db = DatabaseConnectionHelper(APP.config['DATABASE_URI'])
+        orders = db.get_all_orders_belonging_to_user_from_db(user_id)
         del db
         return orders
 

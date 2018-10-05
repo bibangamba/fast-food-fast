@@ -27,13 +27,12 @@ class OrderTest(unittest.TestCase):
         self.app = create_app("testing")
         APP.config = self.app.config
         self.db = DatabaseConnectionHelper(APP.config['DATABASE_URI'])
-        # self.db = DatabaseConnectionHelper("postgresql://postgres:bibangamba2@localhost:5432/fast-food-fast-test?application_name=bibangamba-fast-food-fast-api-v2")
         self.db.create_all_tables()
         with self.app.app_context():
             self.auth_token = create_access_token(
-                identity={'name': "Andrew.T", 'email': "andrew@g.com", 'id': "1", 'admin': True})
+                identity={'name': "Andrew.T", 'phone':'0785222293', 'email': "andrew@g.com", 'id': "1", 'admin': True})
             self.auth_token2 = create_access_token(
-                identity={'name': "Joseph.H", 'email': "joseph@g.com", 'id': "1", 'admin': False})
+                identity={'name': "Joseph.H", 'phone':'0785222293', 'email': "joseph@g.com", 'id': "1", 'admin': False})
             self.headers = {'Authorization': 'Bearer {}'.format(self.auth_token)}
             self.headers2 = {'Authorization': 'Bearer {}'.format(self.auth_token2)}
         self.client = self.app.test_client

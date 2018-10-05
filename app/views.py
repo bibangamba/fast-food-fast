@@ -12,15 +12,21 @@ from .validations import Validator
 order_api = Blueprint('order_api', __name__,)
 
 
-@order_api.route('orders/', methods=['POST'])
+@order_api.route('users/orders', methods=['POST'])
 @jwt_required
 def place_new_order():
     """
     place new  order function
     """
+    current_user = get_jwt_identity()
+
     request_data = request.json
     json_response_message = {}
 
+    #set user details from token encoded data
+    request_data['customer_name'] = current_user.get('name')
+    request_data['customer_phone'] = current_user.get('phone')
+    request_data['user_id'] = current_user.get('id')
     def validate_request_data_contains_valid_parameters(parameter_key):
         if(parameter_key == 'customer_order'):
             if not request_data.get(parameter_key):
@@ -72,8 +78,6 @@ def place_new_order():
             return custom_response(json_response_message.get('message'), json_response_message.get('status_code'))
 
 
-    validate_request_data_contains_valid_parameters('customer_name')
-    validate_request_data_contains_valid_parameters('customer_phone')
     validate_request_data_contains_valid_parameters('customer_order')
     if len(json_response_message) > 0:
         return custom_response(json_response_message.get('message'), json_response_message.get('status_code'))
@@ -91,6 +95,17 @@ def place_new_order():
     OrderModel.place_order(order)
     return custom_response({"success": "Order placed successfully!", "saved_order": order}, 201)
 
+@order_api.route('users/orders/', methods=['GET'])
+@jwt_required
+def get_user_order_history():
+    """
+    get all orders belonging to user function
+    """
+    current_user = get_jwt_identity()
+    user_id = current_user.get('id')
+
+    orders = OrderModel.get_user_order_history(user_id)
+    return custom_response(orders, 200)
 
 @order_api.route('orders/', methods=['GET'])
 @jwt_required #- ADMIN
@@ -192,12 +207,13 @@ def log_user_in():
     user_id = user_from_db.get('id')
     is_admin = user_from_db.get('admin')
     name = user_from_db.get('name')
+    phone = user_from_db.get('phone')
 
     if(db_user_password != password):
         return custom_response({"error": "Email/Password authntication failed"}, 401)
 
     auth_token = create_access_token(
-        identity={'name': name, 'email': email, 'id': user_id, 'admin': is_admin})
+        identity={'name': name, 'phone': phone, 'email': email, 'id': user_id, 'admin': is_admin})
     return custom_response({'success': 'Successfully logged in as {}'.format(name), 'jwt_token': auth_token}, 200)
 
 #MENU
