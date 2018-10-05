@@ -95,7 +95,7 @@ class DatabaseConnectionHelper():
 
     def get_order_from_db(self, order_id):
         self.cursor.execute(
-            "SELECT * FROM orders WHERE id = '%s'",(order_id))
+            "SELECT * FROM orders WHERE id = %s",(order_id))
         order = self.cursor.fetchone()
         if order is not None:
             order_organized = {} 

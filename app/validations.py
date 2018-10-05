@@ -74,10 +74,10 @@ class Validator:
             message['error'] = 'Email parameter must be a string.'
             message['status_code'] = 400
         elif len(email.strip()) == 0:
-            message['error'] = 'Email parameter must be a string.'
+            message['error'] = 'Email parameter cannot be empty.'
             message['status_code'] = 400
         elif "@" not in email:
-            message['error'] = 'Supplied email parameter is not a valid email format.'
+            message['error'] = 'Supplied email parameter is not a valid email format. Must contain an @'
             message['status_code'] = 400
         else:
             #name validation
@@ -118,4 +118,40 @@ class Validator:
                     elif not phone.isdigit():
                         message['error'] = 'Phone parameter must be a digits only string.'
                         message['status_code'] = 400 
+        return message
+
+    @classmethod
+    def validate_login_request_data(cls, request_data):
+        message = {}
+        if request_data is None:
+            message['error'] = 'Missing JSON request data.'
+            message['status_code'] = 400
+            return message
+
+        email = request_data.get('email')
+        password = request_data.get('password')
+        
+        if email is None:
+            message['error'] = 'Missing email parameter.'
+            message['status_code'] = 400
+        elif not isinstance(email, str):
+            message['error'] = 'Email parameter must be a string.'
+            message['status_code'] = 400
+        elif len(email.strip()) == 0:
+            message['error'] = 'Email parameter cannot be empty.'
+            message['status_code'] = 400
+        elif "@" not in email:
+            message['error'] = 'Supplied email parameter is not a valid email format. Must contain an @'
+            message['status_code'] = 400
+        else:
+            if password is None:
+                    message['error'] = 'Missing password parameter. It is required.'
+                    message['status_code'] = 400
+            elif not isinstance(password, str):
+                message['error'] = 'Password parameter must be a string.'
+                message['status_code'] = 400
+            elif len(password) < 8:
+                message['error'] = 'Password must be 8 characters or more'
+                message['status_code'] = 400
+                
         return message

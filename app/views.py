@@ -154,13 +154,16 @@ def register_user():
         return custom_response({'error': message.get('error')}, message.get('status_code'))
 
     email = request_data.get('email')
-    #validate user does not exist already
+    
     user_exists = UserModel.get_user_by_email(email)
-    user_exists.pop('password')
     if user_exists is not None:
-        return custom_response({"error": "User with specified email already exists in the database", "fail": user_exists}, 409)
+        user_exists.pop('password')
+        return custom_response({"error": "User with email:'{}' already exists in the database".format(email), "fail": user_exists}, 409)
+    
     user = UserModel(request_data).to_dictionary()
     #pop() removes password from returned user data
+
+    #todo: hash password with bcrypt before saving to db
     saved_user = UserModel.add_user(user)
     saved_user.pop('password')
     return custom_response({"success": "User was successfully created", "saved_user": saved_user}, 200)
@@ -171,24 +174,27 @@ def register_user():
 def log_user_in():
     request_data = request.json
 
-    if not request_data:
-        return custom_response({"error": "Missing JSON in the request"}, 400)
-    else:
-        email = request_data.get('email')
-        password = request_data.get('password')
-        if not email:
-            return custom_response({"error": "Missing email parameter"}, 400)
-        else:
-            if not password:
-                return custom_response({"error": "Missing password parameter"}, 400)
-    # validate email
-    if email != 'test' and password != 'test':  # validate user exists in the db and password is a match
-        # 401 - unauthorized, but could do 422 (unprocessed entity) too?
-        return custom_response({"error": "Missing password parameter"}, 401)
+    message = Validator.validate_login_request_data(request_data)
+    if len(message) > 0:
+        return custom_response({'error': message.get('error')}, message.get('status_code'))
 
-    # auth_token = create_access_token(identity={'email': 'test', 'id': 1, 'admin': False})
-    auth_token = create_access_token(identity={'email': 'test'})
-    return custom_response({'success': 'successfully logged in', 'jwt_token': auth_token}, 200)
+    email = request_data.get('email')
+    password = request_data.get('password')
+
+    if UserModel.get_user_by_email(email) is None:
+        return custom_response({"error": "User with email: {},is not registered.".format(email)}, 401)
+
+    #todo add bcrypt to unhash password when given hash salt
+    db_user_password = UserModel.get_user_by_email(email).get('password')
+    user_id = UserModel.get_user_by_email(email).get('id')
+    is_admin = UserModel.get_user_by_email(email).get('admin')
+    name = UserModel.get_user_by_email(email).get('name')
+
+    if(db_user_password != password):
+        return custom_response({"error": "Email/Password authntication failed"}, 401)
+
+    auth_token = create_access_token(identity={'name': name,'email': email, 'id': user_id, 'admin': is_admin})
+    return custom_response({'success': 'Successfully logged in as {}'.format(name), 'jwt_token': auth_token}, 200)
 
 
 def custom_response(res, status_code):
