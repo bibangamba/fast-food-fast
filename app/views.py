@@ -129,6 +129,7 @@ def get_order(order_id):
 
 
 @order_api.route('orders/<int:order_id>', methods=['PUT'])
+@jwt_required
 def change_order_status(order_id):
     """
     get specific order function
