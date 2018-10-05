@@ -34,16 +34,16 @@ If however, you'd like to run the app on your local machine:
     - `set FLASK_ENV="development"` on windows cmd (`$env:FLASK_ENV="development"` in powershell) or `export FLASK_ENV="development"`
     - `set PORT=5000` on windows cmd (`$env:PORT=5000` in powershell) or `export PORT=5000` on macOS
 5. run `pip install -r requirements.txt` to install all the required packages
-6. run `python run.py` to start the app. you can then navigate to `localhost:5000/api/v1/orders/`
+6. run `python run.py` to start the app. you can then navigate to `localhost:5000/api/v2/orders/`
 
 ### Working with the endpoints
 
 |Endpoint                       |Method |Action                                     |Parameters                                     |
 |:---                           |:---   |:---                                       |:--                                            |
-|/api/v1/orders/                |GET    |get a list of all orders                   |N/A                                            |
-|/api/v1/orders/int:order_id    |GET    |get a specific order whose id = order_id   |order_id                                       |
-|/api/v1/orders/                |POST   |place an order                             |customer_name, customer_order, customer_contact|
-|/api/v1/orders/int:order_id    |PUT    |update an order's status                   |order_id, status                               |
+|/api/v2/orders/                |GET    |get a list of all orders                   |N/A                                            |
+|/api/v2/orders/int:order_id    |GET    |get a specific order whose id = order_id   |order_id                                       |
+|/api/v2/orders/                |POST   |place an order                             |customer_name, customer_order, customer_contact|
+|/api/v2/orders/int:order_id    |PUT    |update an order's status                   |order_id, status                               |
 
 ### Parameters description
 

@@ -23,9 +23,10 @@ class DatabaseConnectionHelper():
             """
         CREATE TABLE IF NOT EXISTS users(
             id serial PRIMARY KEY,
-            email VARCHAR,
+            name VARCHAR,
+            email VARCHAR UNIQUE,
             phone VARCHAR(15),
-            admin BOOLEAN,
+            admin BOOLEAN NOT NULL DEFAULT FALSE,
             password VARCHAR)
         """
         )
@@ -94,10 +95,10 @@ class DatabaseConnectionHelper():
 
     def get_order_from_db(self, order_id):
         self.cursor.execute(
-            "SELECT * FROM orders WHERE id = {}".format(order_id))
+            "SELECT * FROM orders WHERE id = '%s'",(order_id))
         order = self.cursor.fetchone()
         if order is not None:
-            order_organized = {}
+            order_organized = {} 
             order_organized['id'] = order[0]
             order_organized['customer_name'] = order[1]
             order_organized['customer_phone'] = order[2]
@@ -106,12 +107,119 @@ class DatabaseConnectionHelper():
             order_organized['order_date'] = order[5]
             return order_organized
         else:
-            return None
+            return order
 
     def update_order_status_in_db(self, order_id, order_status_update):
             self.cursor.execute(
                 "UPDATE orders SET order_status = %s WHERE id = %s;", (order_status_update, order_id))
             return self.get_order_from_db(order_id)
+
+    #USER RELATED
+    def insert_user_into_db(self, user):
+        query = """
+            INSERT INTO users (
+                name,
+                email,
+                phone,
+                password) VALUES ( %s, %s, %s, %s) RETURNING id;
+        """
+        self.cursor.execute(query, (user.get('name'),
+                                    user.get('email'),
+                                    user.get('phone'),
+                                    user.get('password')))
+        self.connection.commit()
+        #set id field to the id returned from insert query
+        user['id'] = self.cursor.fetchone()[0]
+        return user
+
+    def find_user_in_db_using_id(self, id):
+        self.cursor.execute(
+            "SELECT * FROM users WHERE id = %s", (id))
+        user = self.cursor.fetchone()
+        if user is not None:
+            organized_user = {}
+            organized_user['id'] = user[0]
+            organized_user['name'] = user[1]
+            organized_user['email'] = user[2]
+            organized_user['phone'] = user[3]
+            organized_user['admin'] = user[4]
+            organized_user['password'] = user[5]
+            return organized_user
+        else:
+            return user
+
+    def find_user_in_db_using_email(self, email):
+        #todo: refactor to remove duplication
+        self.cursor.execute(
+            "SELECT * FROM users WHERE email = '{}'".format(email))
+        user = self.cursor.fetchone()
+        if user is not None:
+            organized_user = {}
+            organized_user['id'] = user[0]
+            organized_user['name'] = user[1]
+            organized_user['email'] = user[2]
+            organized_user['phone'] = user[3]
+            organized_user['admin'] = user[4]
+            organized_user['password'] = user[5]
+            return organized_user
+        else:
+            return user
+
+
+    def update_user_role_in_db(self, user_id, user_is_admin):
+            self.cursor.execute(
+                "UPDATE users SET admin = %s WHERE id = %s;", (user_is_admin, user_id))
+            return self.find_user_in_db_using_id(user_id)
+
+    #MENU RELATED
+    def insert_menu_item_into_db(self, menu_item):
+        query = """
+            INSERT INTO menu (
+                food_name,
+                food_description,
+                price) VALUES (%s, %s, %s) RETURNING id;
+        """
+        self.cursor.execute(query, (menu_item.get('food_name'),
+                                    menu_item.get('food_description'),
+                                    menu_item.get('price')))
+        self.connection.commit()
+        menu_item['id'] = self.cursor.fetchone()[0]
+        return menu_item
+
+    def get_all_menu_items_from_db(self):
+        list_of_menu_items = []
+        self.cursor.execute("SELECT * FROM menu")
+        menu_items = self.cursor.fetchall()
+        self.connection.commit()
+
+        for menu_item in menu_items:
+            organized_menu_item = {}
+            organized_menu_item['id'] = menu_item[0]
+            organized_menu_item['food_name'] = menu_item[1]
+            organized_menu_item['price'] = menu_item[2]
+            organized_menu_item['food_description'] = menu_item[3]
+            list_of_menu_items.append(organized_menu_item)
+        return list_of_menu_items
+
+    def find_menu_item_in_db_using_id(self, menu_item_id):
+        self.cursor.execute(
+            "SELECT * FROM menu WHERE id = %s",(menu_item_id))
+        menu_item = self.cursor.fetchone()
+        if menu_item is not None:
+            organized_menu_item = {}
+            organized_menu_item['id'] = menu_item[0]
+            organized_menu_item['food_name'] = menu_item[1]
+            organized_menu_item['price'] = menu_item[2]
+            organized_menu_item['food_description'] = menu_item[3]
+            return organized_menu_item
+        else:
+            return menu_item
+        pass
+
+    def update_menu_item_price_in_db(self, menu_item_id, price):
+        self.cursor.execute(
+                "UPDATE menu SET price = %s WHERE id = %s;", (price, menu_item_id))
+        return self.find_menu_item_in_db_using_id(menu_item_id)
 
     def delete_data_from_all_tables(self):
         #'restart identity' resets id column in 'serial' columns

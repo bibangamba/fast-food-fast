@@ -1,15 +1,18 @@
 #app/views.py
+import os
 
-from flask import request, json, jsonify, Response, Blueprint
-from .models import OrderModel
-
-# import ast
+from flask import Flask, request, json, jsonify, Response, Blueprint
+from .models import UserModel, OrderModel, MenuModel
+from flask_jwt_extended import (
+    JWTManager, jwt_required, create_access_token, get_jwt_identity)
+from app import APP
+from .validations import Validator
 
 #create blueprint app
 order_api = Blueprint('order_api', __name__,)
 
 
-@order_api.route('/', methods=['POST'])
+@order_api.route('orders/', methods=['POST'])
 def place_new_order():
     """
     place new  order function
@@ -67,6 +70,16 @@ def place_new_order():
         if len(json_response_message) > 0:
             return custom_response(json_response_message.get('message'), json_response_message.get('status_code'))
 
+    validate_customer_name = Validator.validate_request_data_contains_valid_parameters(
+        request_data, {}, 'customer_name')
+    # validate_customer_phone =  Validator.validate_request_data_contains_valid_parameters(request_data, {}, 'customer_phone')
+    # validate_customer_order = Validator.validate_request_data_contains_valid_parameters(request_data, {}, 'customer_order')
+    print("############# validate customer name", validate_customer_name)
+    print("############# validate customer phone", validate_customer_name)
+    print("############# validate customer order", validate_customer_name)
+
+    # if len(validate_customer_name) > 0 or len(validate_customer_phone) > 0 or len(validate_customer_order) > 0 :
+    #     return custom_response(json_response_message.get('message'), json_response_message.get('status_code'))
     validate_request_data_contains_valid_parameters('customer_name')
     validate_request_data_contains_valid_parameters('customer_phone')
     validate_request_data_contains_valid_parameters('customer_order')
@@ -87,7 +100,7 @@ def place_new_order():
     return custom_response({"success": "Order placed successfully!", "saved_order": order}, 201)
 
 
-@order_api.route('/', methods=['GET'])
+@order_api.route('orders/', methods=['GET'])
 def get_all_orders():
     """
     get all orders function
@@ -98,7 +111,7 @@ def get_all_orders():
     return custom_response(orders, 200)
 
 
-@order_api.route('/<int:order_id>', methods=['GET'])
+@order_api.route('orders/<int:order_id>', methods=['GET'])
 def get_order(order_id):
     """
     get specific order function
@@ -113,7 +126,7 @@ def get_order(order_id):
     return custom_response(order, 200)
 
 
-@order_api.route('/<int:order_id>', methods=['PUT'])
+@order_api.route('orders/<int:order_id>', methods=['PUT'])
 def change_order_status(order_id):
     """
     get specific order function
@@ -128,6 +141,54 @@ def change_order_status(order_id):
     if not order:
         return custom_response({"error": "No order found with id: {}".format(order_id)}, 404)
     return custom_response({"success": "Order status was changed successfully!", "order": order}, 201)
+
+
+#LOGIN AND SIGNUP
+@order_api.route('auth/signup', methods=['POST'])
+def register_user():
+    request_data = request.json
+
+    message = Validator.validate_register_user_data(request_data)
+
+    if len(message) > 0:
+        return custom_response({'error': message.get('error')}, message.get('status_code'))
+
+    email = request_data.get('email')
+    #validate user does not exist already
+    user_exists = UserModel.get_user_by_email(email)
+    user_exists.pop('password')
+    if user_exists is not None:
+        return custom_response({"error": "User with specified email already exists in the database", "fail": user_exists}, 409)
+    user = UserModel(request_data).to_dictionary()
+    #pop() removes password from returned user data
+    saved_user = UserModel.add_user(user)
+    saved_user.pop('password')
+    return custom_response({"success": "User was successfully created", "saved_user": saved_user}, 200)
+
+
+@order_api.route('auth/login', methods=['POST'])
+# @app.route('/api/v2/auth/login', methods=['POST'])
+def log_user_in():
+    request_data = request.json
+
+    if not request_data:
+        return custom_response({"error": "Missing JSON in the request"}, 400)
+    else:
+        email = request_data.get('email')
+        password = request_data.get('password')
+        if not email:
+            return custom_response({"error": "Missing email parameter"}, 400)
+        else:
+            if not password:
+                return custom_response({"error": "Missing password parameter"}, 400)
+    # validate email
+    if email != 'test' and password != 'test':  # validate user exists in the db and password is a match
+        # 401 - unauthorized, but could do 422 (unprocessed entity) too?
+        return custom_response({"error": "Missing password parameter"}, 401)
+
+    # auth_token = create_access_token(identity={'email': 'test', 'id': 1, 'admin': False})
+    auth_token = create_access_token(identity={'email': 'test'})
+    return custom_response({'success': 'successfully logged in', 'jwt_token': auth_token}, 200)
 
 
 def custom_response(res, status_code):

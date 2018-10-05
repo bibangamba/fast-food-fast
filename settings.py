@@ -1,5 +1,5 @@
 import os
-from dotenv import load_dotenv, find_dotenv
+from dotenv import load_dotenv
 load_dotenv()
 
 db_uri = os.getenv('DATABASE_URI')

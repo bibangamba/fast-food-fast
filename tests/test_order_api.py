@@ -30,7 +30,7 @@ class OrderTest(unittest.TestCase):
 
         self.client = self.app.test_client
 
-        self.URL = '/api/v1/orders/'
+        self.URL = '/api/v2/'
 
         self.order_no_customer_order = {
             'customer_name': 'andrew',
@@ -61,7 +61,7 @@ class OrderTest(unittest.TestCase):
                                              'quantity': 1}]
 
     def post(self, data):
-        return self.client().post(self.URL, json=data)  # response from post request
+        return self.client().post(self.URL+"orders/", json=data)  # response from post request
 
     #ORDER SAVING
     def test_place_order_with_correct_data(self):
@@ -116,7 +116,7 @@ class OrderTest(unittest.TestCase):
         """
         test saving an order with empty customer_name param
         """
-        res = self.client().post(self.URL,
+        res = self.client().post(self.URL+"orders/",
                                  json=dict(customer_name='  ', customer_phone='0782930481',
                                            customer_order=self.cust_order))
 
@@ -129,7 +129,7 @@ class OrderTest(unittest.TestCase):
         """
         test saving an order with empty customer_phone param
         """
-        res = self.client().post(self.URL,
+        res = self.client().post(self.URL+"orders/",
                                  json=dict(customer_name='andrew', customer_phone='    ',
                                            customer_order=self.cust_order))
 
@@ -142,7 +142,7 @@ class OrderTest(unittest.TestCase):
         """
         test saving an order with empty customer_order param
         """
-        res = self.client().post(self.URL,
+        res = self.client().post(self.URL+"orders/",
                                  json=dict(customer_name='andrew', customer_phone='0782930481', customer_order=[]))
 
         json_res_data = json.loads(res.data)
@@ -155,7 +155,7 @@ class OrderTest(unittest.TestCase):
         """
         test saving an order with empty customer_order param
         """
-        res = self.client().get(self.URL)
+        res = self.client().get(self.URL+"orders/")
         json_res_data = json.loads(res.data)
 
         self.assertEqual(json_res_data.get('info'), "No orders placed yet")
@@ -167,7 +167,7 @@ class OrderTest(unittest.TestCase):
         """
         self.post_sample_orders()
 
-        res = self.client().get(self.URL)
+        res = self.client().get(self.URL+"orders/")
         self.assertEqual(res.status_code, 200)
 
     #FIND SPECIFIC ORDER
@@ -177,7 +177,7 @@ class OrderTest(unittest.TestCase):
         """
         self.post_sample_orders()
 
-        res = self.client().get(self.URL+'1')
+        res = self.client().get(self.URL+"orders/1")
         self.assertEqual(res.status_code, 200)
 
     def test_get_specific_order_failed(self):
@@ -186,7 +186,7 @@ class OrderTest(unittest.TestCase):
         """
         self.post_sample_orders()
 
-        res = self.client().get(self.URL+'5')
+        res = self.client().get(self.URL+"orders/5")
         json_res_data = json.loads(res.data)
         self.assertEqual(json_res_data.get('error'),
                          "No order found with id: 5")
@@ -199,7 +199,7 @@ class OrderTest(unittest.TestCase):
         """
         self.post_sample_orders()
 
-        res = self.client().put(self.URL+'1', json=dict(status='complete'))
+        res = self.client().put(self.URL+"orders/1", json=dict(status='complete'))
         json_res_data = json.loads(res.data)
         self.assertEqual(json_res_data.get('success'),
                          "Order status was changed successfully!")
@@ -211,7 +211,7 @@ class OrderTest(unittest.TestCase):
         """
         self.post_sample_orders()
 
-        res = self.client().put(self.URL+'2', json=dict(status='blah'))
+        res = self.client().put(self.URL+"orders/2", json=dict(status='blah'))
         json_res_data = json.loads(res.data)
         self.assertEqual(json_res_data.get('error'),
                          "'status' can only be one of these options: new, processing, cancelled, or complete")
@@ -223,22 +223,22 @@ class OrderTest(unittest.TestCase):
         """
         self.post_sample_orders()
 
-        res = self.client().put(self.URL+'2', json=dict())
+        res = self.client().put(self.URL+"orders/2", json=dict())
         json_res_data = json.loads(res.data)
         self.assertEqual(json_res_data.get('error'),
                          "'status' parameter not supplied")
         self.assertEqual(res.status_code, 400)
 
     def post_sample_orders(self):
-        self.client().post(self.URL,
+        self.client().post(self.URL+"orders/",
                            json=dict(customer_name='andrew',
                                      customer_phone='0782930481',
                                      customer_order=self.cust_order))
-        self.client().post(self.URL,
+        self.client().post(self.URL+"orders/",
                            json=dict(customer_name='jospeh',
                                      customer_phone='0782930481',
                                      customer_order=self.cust_order))
-        self.client().post(self.URL,
+        self.client().post(self.URL+"orders/",
                            json=dict(customer_name='karungi',
                                      customer_phone='0782930481',
                                      customer_order=self.cust_order))

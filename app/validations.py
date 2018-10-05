@@ -1,0 +1,121 @@
+class Validator:
+    @classmethod
+    def validate_request_data_contains_valid_parameters(cls, request_data, json_response_message, parameter_key):
+        if(parameter_key == 'customer_order'):
+            if not request_data.get(parameter_key):
+                json_response_message['message'] = {
+                    "error": parameter_key + " is missing or empty. List of required: customer_name, customer_phone, customer_order"}
+                json_response_message['status_code'] = 400
+        else:
+            if not request_data.get(parameter_key):
+                json_response_message['message'] = {
+                    "error": "Missing " + parameter_key + " parameter. List of required: customer_name, customer_phone, customer_order"}
+                json_response_message['status_code'] = 400
+
+            else:
+                parameter = request_data.get(parameter_key)
+                if parameter.strip() == '':
+                    json_response_message['message'] = {
+                        "error": "{} cannot be empty".format(parameter_key)}
+                    json_response_message['status_code'] = 400
+        return json_response_message
+
+    # @classmethod
+    # def validate_customer_order_content_and_values(cls, order, content_key, content_type):
+    #     json_response_message = {}
+    #     if content_key not in order:
+    #         json_response_message['message'] = {"error": "Badly foramtted customer_order. Missing "+content_key +
+    #                                             " field in {}. correct format example for 'customer_order' is: {}".format(order, customer_order_format)}
+    #         json_response_message['status_code'] = 400
+    #     else:
+    #         if content_type == 'str':
+    #             if isinstance(order.get(content_key), str):
+    #                 if str(order.get(content_key)).strip() == '':
+    #                     json_response_message['message'] = {
+    #                         "error": "customer_order["+content_key+"] value must be a non empty string"}
+    #                     json_response_message['status_code'] = 400
+    #             else:
+    #                 json_response_message['message'] = {
+    #                     "error": "customer_order["+content_key+"] value must be a string, found in {}".format(order)}
+    #                 json_response_message['status_code'] = 400
+    #         elif content_type == 'int':
+    #             if isinstance(order.get(content_key), int):
+    #                 if order.get(content_key) < 1:
+    #                     json_response_message['message'] = {
+    #                         "error": "customer_order[{}] value must be greater than 1, found in {}".format(content_key, order)}
+    #                     json_response_message['status_code'] = 400
+    #             else:
+    #                     json_response_message['message'] = {
+    #                         "error": "customer_order[{}] value must be an integer. found in {}".format(content_key, order)}
+    #                     json_response_message['status_code'] = 400
+
+    #     if len(json_response_message) > 0:
+    #         return custom_response(json_response_message.get('message'), json_response_message.get('status_code'))
+
+    @classmethod
+    def validate_register_user_data(cls, request_data):
+        message = {}
+        if request_data is None:
+            message['error'] = 'Missing JSON request data.'
+            message['status_code'] = 400
+            return message
+
+        email = request_data.get('email')
+        name = request_data.get('name')
+        password = request_data.get('password')
+        confirm_password = request_data.get('confirm_password')#can be done on the client
+        phone = request_data.get('phone')
+        
+        #email validation
+        if email is None:
+            message['error'] = 'Missing email parameter. It is required.'
+            message['status_code'] = 400
+        elif not isinstance(email, str):
+            message['error'] = 'Email parameter must be a string.'
+            message['status_code'] = 400
+        elif len(email.strip()) == 0:
+            message['error'] = 'Email parameter must be a string.'
+            message['status_code'] = 400
+        elif "@" not in email:
+            message['error'] = 'Supplied email parameter is not a valid email format.'
+            message['status_code'] = 400
+        else:
+            #name validation
+            if name is None:
+                message['error'] = 'Missing name parameter. It is required.'
+                message['status_code'] = 400
+            elif not isinstance(name, str):
+                message['error'] = 'Name parameter must be a string.'
+                message['status_code'] = 400
+            elif len(name.strip()) == 0:
+                message['error'] = 'Name parameter must be a string.'
+                message['status_code'] = 400
+            else:
+                #password validation
+                if password is None:
+                    message['error'] = 'Missing password parameter. It is required.'
+                    message['status_code'] = 400
+                elif not isinstance(password, str):
+                    message['error'] = 'Password parameter must be a string.'
+                    message['status_code'] = 400
+                elif password != confirm_password:
+                    message['error'] = 'Confirm Password does not match Password. They must match'
+                    message['status_code'] = 400
+                elif len(password) < 8:
+                    message['error'] = 'Password must be 8 characters or more'
+                    message['status_code'] = 400
+                else:
+                    #phone validation
+                    if phone is None:
+                        message['error'] = 'Missing phone parameter. It is required.'
+                        message['status_code'] = 400
+                    elif not isinstance(phone, str):
+                        message['error'] = 'Phone parameter must be a string.'
+                        message['status_code'] = 400
+                    elif len(phone) != 10:
+                        message['error'] = 'Phone parameter must have a length of 10 (ten numbers).'
+                        message['status_code'] = 400
+                    elif not phone.isdigit():
+                        message['error'] = 'Phone parameter must be a digits only string.'
+                        message['status_code'] = 400 
+        return message
