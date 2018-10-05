@@ -13,6 +13,7 @@ order_api = Blueprint('order_api', __name__,)
 
 
 @order_api.route('orders/', methods=['POST'])
+@jwt_required
 def place_new_order():
     """
     place new  order function
@@ -70,16 +71,7 @@ def place_new_order():
         if len(json_response_message) > 0:
             return custom_response(json_response_message.get('message'), json_response_message.get('status_code'))
 
-    validate_customer_name = Validator.validate_request_data_contains_valid_parameters(
-        request_data, {}, 'customer_name')
-    # validate_customer_phone =  Validator.validate_request_data_contains_valid_parameters(request_data, {}, 'customer_phone')
-    # validate_customer_order = Validator.validate_request_data_contains_valid_parameters(request_data, {}, 'customer_order')
-    print("############# validate customer name", validate_customer_name)
-    print("############# validate customer phone", validate_customer_name)
-    print("############# validate customer order", validate_customer_name)
 
-    # if len(validate_customer_name) > 0 or len(validate_customer_phone) > 0 or len(validate_customer_order) > 0 :
-    #     return custom_response(json_response_message.get('message'), json_response_message.get('status_code'))
     validate_request_data_contains_valid_parameters('customer_name')
     validate_request_data_contains_valid_parameters('customer_phone')
     validate_request_data_contains_valid_parameters('customer_order')
@@ -101,10 +93,15 @@ def place_new_order():
 
 
 @order_api.route('orders/', methods=['GET'])
+@jwt_required #- ADMIN
 def get_all_orders():
     """
     get all orders function
     """
+    current_user = get_jwt_identity()
+    if not current_user.get('admin'):
+        return custom_response({'error':'You do not have enough permissions to access this endpoint'}, 401)
+
     orders = OrderModel.get_all_orders()
     if len(orders) == 0:
         return custom_response({"info": "No orders placed yet"}, 200)
@@ -112,10 +109,15 @@ def get_all_orders():
 
 
 @order_api.route('orders/<int:order_id>', methods=['GET'])
+@jwt_required #- ADMIN
 def get_order(order_id):
     """
     get specific order function
     """
+    current_user = get_jwt_identity()
+    if not current_user.get('admin'):
+        return custom_response({'error':'You do not have enough permissions to access this endpoint'}, 401)
+
     order = OrderModel.get_specific_order(order_id)
 
     if not order:
@@ -154,12 +156,12 @@ def register_user():
         return custom_response({'error': message.get('error')}, message.get('status_code'))
 
     email = request_data.get('email')
-    
+
     user_exists = UserModel.get_user_by_email(email)
     if user_exists is not None:
         user_exists.pop('password')
         return custom_response({"error": "User with email:'{}' already exists in the database".format(email), "fail": user_exists}, 409)
-    
+
     user = UserModel(request_data).to_dictionary()
     #pop() removes password from returned user data
 
@@ -170,7 +172,6 @@ def register_user():
 
 
 @order_api.route('auth/login', methods=['POST'])
-# @app.route('/api/v2/auth/login', methods=['POST'])
 def log_user_in():
     request_data = request.json
 
@@ -180,22 +181,67 @@ def log_user_in():
 
     email = request_data.get('email')
     password = request_data.get('password')
+    user_from_db = UserModel.get_user_by_email(email)
 
-    if UserModel.get_user_by_email(email) is None:
+    if user_from_db is None:
         return custom_response({"error": "User with email: {},is not registered.".format(email)}, 401)
 
     #todo add bcrypt to unhash password when given hash salt
-    db_user_password = UserModel.get_user_by_email(email).get('password')
-    user_id = UserModel.get_user_by_email(email).get('id')
-    is_admin = UserModel.get_user_by_email(email).get('admin')
-    name = UserModel.get_user_by_email(email).get('name')
+    db_user_password = user_from_db.get('password')
+    user_id = user_from_db.get('id')
+    is_admin = user_from_db.get('admin')
+    name = user_from_db.get('name')
 
     if(db_user_password != password):
         return custom_response({"error": "Email/Password authntication failed"}, 401)
 
-    auth_token = create_access_token(identity={'name': name,'email': email, 'id': user_id, 'admin': is_admin})
+    auth_token = create_access_token(
+        identity={'name': name, 'email': email, 'id': user_id, 'admin': is_admin})
     return custom_response({'success': 'Successfully logged in as {}'.format(name), 'jwt_token': auth_token}, 200)
 
+#MENU
+@order_api.route('menu', methods=['POST'])
+@jwt_required # - ADMIN 
+def add_food_to_menu():
+    #Admin user filter
+    current_user = get_jwt_identity()
+    if not current_user.get('admin'):
+        return custom_response({'error':'You do not have enough permissions to access this endpoint'}, 401)
+
+
+    request_data = request.json
+
+    message = Validator.validate_new_menu_item_request_data(request_data)
+
+    if len(message) > 0:
+        return custom_response({'error': message.get('error')}, message.get('status_code'))
+
+    food_name = request_data.get('food_name')
+
+    food_already_saved = MenuModel.get_menu_item_by_food_name(food_name)
+    if food_already_saved is not None:
+        price = food_already_saved['price']
+        food_already_saved['price'] = int(price)
+        return custom_response({"error": "Food name: {} is already on the menu. Please supply a different food_name".format(food_name), "failed_save": food_already_saved}, 409)
+
+    food_item = MenuModel(request_data).to_dictionary()
+
+    #todo: hash password with bcrypt before saving to db
+    saved_food_item = MenuModel.add_menu_item(food_item)
+
+    return custom_response({"success": "Menu was updated with {}".format(food_name), "saved_food_item": saved_food_item}, 200)
+
+@order_api.route('menu/', methods=['GET'])
+@jwt_required
+def get_menu():
+    """
+    get all orders function
+    """
+    pass
+    # orders = OrderModel.get_all_orders()
+    # if len(orders) == 0:
+    #     return custom_response({"info": "No orders placed yet"}, 200)
+    # return custom_response(orders, 200)
 
 def custom_response(res, status_code):
     """

@@ -29,7 +29,7 @@ If however, you'd like to run the app on your local machine:
     - to create: `python -m venv env-name` (windows) or `python3 -m venv env-name` (macOS)
     - to activate: `env-name\Scripts\activate.bat` (windows cmd. repalce `.bat` with `.ps1` for windows powershell) or `source env-name/bin/activate`
     - to deactivate: `env-name\Scripts\deactivate.bat` (windows)
-4. set FLASK_ENV to development and PORT to 5000
+4. set environment variable FLASK_ENV to development, PORT to 5000, DATABASE_URI to postgres development database, and TEST_DATABASE_URI to postgres test database
 
     - `set FLASK_ENV="development"` on windows cmd (`$env:FLASK_ENV="development"` in powershell) or `export FLASK_ENV="development"`
     - `set PORT=5000` on windows cmd (`$env:PORT=5000` in powershell) or `export PORT=5000` on macOS

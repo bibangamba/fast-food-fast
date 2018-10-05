@@ -155,3 +155,49 @@ class Validator:
                 message['status_code'] = 400
                 
         return message
+
+    @classmethod
+    def validate_new_menu_item_request_data(cls, request_data):
+        message = {}
+        if request_data is None:
+            message['error'] = 'Missing JSON request data.'
+            message['status_code'] = 400
+            return message
+
+        food_name = request_data.get('food_name')
+        price = request_data.get('price')
+        food_description = request_data.get('food_description')
+        
+        #food_name validation
+        if food_name is None:
+            message['error'] = 'Missing food_name parameter. It is required.'
+            message['status_code'] = 400
+        elif not isinstance(food_name, str):
+            message['error'] = 'food_name parameter must be a string.'
+            message['status_code'] = 400
+        elif len(food_name.strip()) == 0:
+            message['error'] = 'food_name parameter cannot be empty.'
+            message['status_code'] = 400
+        elif len(food_name.strip()) > 50:
+            message['error'] = 'food_name parameter should be a short name (less than 50 characters).'
+            message['status_code'] = 400
+        else:
+            #price validation
+            if price is None:
+                message['error'] = 'Missing price parameter. It is required.'
+                message['status_code'] = 400
+            elif not isinstance(price, int):
+                message['error'] = 'price parameter must be an integer.'
+                message['status_code'] = 400
+            else:
+                #food_description validation
+                if food_description is None:
+                    message['error'] = 'Missing food_description parameter. It is required.'
+                    message['status_code'] = 400
+                elif not isinstance(food_description, str):
+                    message['error'] = 'food_description parameter must be a string.'
+                    message['status_code'] = 400
+                elif len(food_name.strip()) == 0:
+                    message['error'] = 'food_name parameter cannot be empty.'
+                    message['status_code'] = 400
+        return message

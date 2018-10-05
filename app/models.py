@@ -185,11 +185,9 @@ class MenuModel():
             price: 12000
             food_description: "grasshoppers pizza is amazing. just imagine it, how can it not be awesome"
         """
-        self.name = data.get('name')
-        self.email = data.get('email')
-        self.phone = data.get('phone')
-        self.admin = False
-        self.password = data.get('password')
+        self.food_name = data.get('food_name')
+        self.food_description = data.get('food_description')
+        self.price = data.get('price')
 
     @classmethod
     def add_menu_item(cls, menu_item):
@@ -208,6 +206,15 @@ class MenuModel():
         """
         db = DatabaseConnectionHelper(APP.config['DATABASE_URI'])
         menu_item = db.find_menu_item_in_db_using_id(menu_item_id)
+        return menu_item
+    
+    @classmethod
+    def get_menu_item_by_food_name(cls, food_name):
+        """
+        search for user with matching id
+        """
+        db = DatabaseConnectionHelper(APP.config['DATABASE_URI'])
+        menu_item = db.find_menu_item_in_db_using_food_name(food_name)
         return menu_item
 
     @classmethod

@@ -1,7 +1,7 @@
 from app import config
 
 import psycopg2
-from psycopg2.extras import Json
+from psycopg2.extras import Json 
 from app import APP
 
 
@@ -36,7 +36,7 @@ class DatabaseConnectionHelper():
             """
         CREATE TABLE IF NOT EXISTS menu(
             id serial PRIMARY KEY,
-            food_name VARCHAR,
+            food_name VARCHAR UNIQUE,
             price NUMERIC,
             food_description VARCHAR)
         """
@@ -95,10 +95,10 @@ class DatabaseConnectionHelper():
 
     def get_order_from_db(self, order_id):
         self.cursor.execute(
-            "SELECT * FROM orders WHERE id = %s",(order_id))
+            "SELECT * FROM orders WHERE id = {}".format(order_id))
         order = self.cursor.fetchone()
         if order is not None:
-            order_organized = {} 
+            order_organized = {}
             order_organized['id'] = order[0]
             order_organized['customer_name'] = order[1]
             order_organized['customer_phone'] = order[2]
@@ -111,7 +111,7 @@ class DatabaseConnectionHelper():
 
     def update_order_status_in_db(self, order_id, order_status_update):
             self.cursor.execute(
-                "UPDATE orders SET order_status = %s WHERE id = %s;", (order_status_update, order_id))
+                "UPDATE orders SET order_status = '{}' WHERE id = {};".format(order_status_update, order_id))
             return self.get_order_from_db(order_id)
 
     #USER RELATED
@@ -134,7 +134,7 @@ class DatabaseConnectionHelper():
 
     def find_user_in_db_using_id(self, id):
         self.cursor.execute(
-            "SELECT * FROM users WHERE id = %s", (id))
+            "SELECT * FROM users WHERE id = {}".format(id))
         user = self.cursor.fetchone()
         if user is not None:
             organized_user = {}
@@ -165,10 +165,9 @@ class DatabaseConnectionHelper():
         else:
             return user
 
-
     def update_user_role_in_db(self, user_id, user_is_admin):
             self.cursor.execute(
-                "UPDATE users SET admin = %s WHERE id = %s;", (user_is_admin, user_id))
+                "UPDATE users SET admin = {} WHERE id = {};".format(user_is_admin, user_id))
             return self.find_user_in_db_using_id(user_id)
 
     #MENU RELATED
@@ -203,7 +202,22 @@ class DatabaseConnectionHelper():
 
     def find_menu_item_in_db_using_id(self, menu_item_id):
         self.cursor.execute(
-            "SELECT * FROM menu WHERE id = %s",(menu_item_id))
+            "SELECT * FROM menu WHERE id = {}".format(menu_item_id))
+        menu_item = self.cursor.fetchone()
+        if menu_item is not None:
+            organized_menu_item = {}
+            organized_menu_item['id'] = menu_item[0]
+            organized_menu_item['food_name'] = menu_item[1]
+            organized_menu_item['price'] = menu_item[2]
+            organized_menu_item['food_description'] = menu_item[3]
+            return organized_menu_item
+        else:
+            return menu_item
+        pass
+    
+    def find_menu_item_in_db_using_food_name(self, food_name):
+        self.cursor.execute(
+            "SELECT * FROM menu WHERE food_name = '{}'".format(food_name))
         menu_item = self.cursor.fetchone()
         if menu_item is not None:
             organized_menu_item = {}
@@ -218,7 +232,7 @@ class DatabaseConnectionHelper():
 
     def update_menu_item_price_in_db(self, menu_item_id, price):
         self.cursor.execute(
-                "UPDATE menu SET price = %s WHERE id = %s;", (price, menu_item_id))
+            "UPDATE menu SET price = {} WHERE id = {};".format(price, menu_item_id))
         return self.find_menu_item_in_db_using_id(menu_item_id)
 
     def delete_data_from_all_tables(self):
