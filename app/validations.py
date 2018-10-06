@@ -20,38 +20,6 @@ class Validator:
                     json_response_message['status_code'] = 400
         return json_response_message
 
-    # @classmethod
-    # def validate_customer_order_content_and_values(cls, order, content_key, content_type):
-    #     json_response_message = {}
-    #     if content_key not in order:
-    #         json_response_message['message'] = {"error": "Badly foramtted customer_order. Missing "+content_key +
-    #                                             " field in {}. correct format example for 'customer_order' is: {}".format(order, customer_order_format)}
-    #         json_response_message['status_code'] = 400
-    #     else:
-    #         if content_type == 'str':
-    #             if isinstance(order.get(content_key), str):
-    #                 if str(order.get(content_key)).strip() == '':
-    #                     json_response_message['message'] = {
-    #                         "error": "customer_order["+content_key+"] value must be a non empty string"}
-    #                     json_response_message['status_code'] = 400
-    #             else:
-    #                 json_response_message['message'] = {
-    #                     "error": "customer_order["+content_key+"] value must be a string, found in {}".format(order)}
-    #                 json_response_message['status_code'] = 400
-    #         elif content_type == 'int':
-    #             if isinstance(order.get(content_key), int):
-    #                 if order.get(content_key) < 1:
-    #                     json_response_message['message'] = {
-    #                         "error": "customer_order[{}] value must be greater than 1, found in {}".format(content_key, order)}
-    #                     json_response_message['status_code'] = 400
-    #             else:
-    #                     json_response_message['message'] = {
-    #                         "error": "customer_order[{}] value must be an integer. found in {}".format(content_key, order)}
-    #                     json_response_message['status_code'] = 400
-
-    #     if len(json_response_message) > 0:
-    #         return custom_response(json_response_message.get('message'), json_response_message.get('status_code'))
-
     @classmethod
     def validate_register_user_data(cls, request_data):
         message = {}
@@ -63,9 +31,10 @@ class Validator:
         email = request_data.get('email')
         name = request_data.get('name')
         password = request_data.get('password')
-        confirm_password = request_data.get('confirm_password')#can be done on the client
+        confirm_password = request_data.get(
+            'confirm_password')  # can be done on the client
         phone = request_data.get('phone')
-        
+
         #email validation
         if email is None:
             message['error'] = 'Missing email parameter. It is required.'
@@ -117,7 +86,7 @@ class Validator:
                         message['status_code'] = 400
                     elif not phone.isdigit():
                         message['error'] = 'Phone parameter must be a digits only string.'
-                        message['status_code'] = 400 
+                        message['status_code'] = 400
         return message
 
     @classmethod
@@ -130,7 +99,7 @@ class Validator:
 
         email = request_data.get('email')
         password = request_data.get('password')
-        
+
         if email is None:
             message['error'] = 'Missing email parameter.'
             message['status_code'] = 400
@@ -153,7 +122,7 @@ class Validator:
             elif len(password) < 8:
                 message['error'] = 'Password must be 8 characters or more'
                 message['status_code'] = 400
-                
+
         return message
 
     @classmethod
@@ -167,7 +136,7 @@ class Validator:
         food_name = request_data.get('food_name')
         price = request_data.get('price')
         food_description = request_data.get('food_description')
-        
+
         #food_name validation
         if food_name is None:
             message['error'] = 'Missing food_name parameter. It is required.'

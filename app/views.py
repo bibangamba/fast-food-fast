@@ -79,6 +79,8 @@ def place_new_order():
 
 
     validate_request_data_contains_valid_parameters('customer_order')
+    # if request_data.get('customer_order') is None:
+        # return custom_message({"error":"customer_order is missing or empty. List of required: customer_name, customer_phone, customer_order"},400)
     if len(json_response_message) > 0:
         return custom_response(json_response_message.get('message'), json_response_message.get('status_code'))
 
