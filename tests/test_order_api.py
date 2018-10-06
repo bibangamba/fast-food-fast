@@ -147,16 +147,16 @@ class OrderTest(unittest.TestCase):
     #     self.assertEqual(res.status_code, 400)
 
     # def test_place_order_with_empty_customer_order(self):
-        """
-        test saving an order with empty customer_order param
-        """
-        res = self.client().post(self.URL+"orders/",
-                                 json=dict(customer_name='andrew', customer_phone='0782930481', customer_order=[]), headers=self.headers2)
+        # """
+        # test saving an order with empty customer_order param
+        # """
+        # res = self.client().post(self.URL+"orders/",
+        #                          json=dict(customer_name='andrew', customer_phone='0782930481', customer_order=[]), headers=self.headers2)
 
-        json_res_data = json.loads(res.data)
-        self.assertEqual(json_res_data.get('error'),
-                         "customer_order is missing or empty. List of required: customer_name, customer_phone, customer_order")
-        self.assertEqual(res.status_code, 400)
+        # json_res_data = json.loads(res.data)
+        # self.assertEqual(json_res_data.get('error'),
+        #                  "customer_order is missing or empty. List of required: customer_name, customer_phone, customer_order")
+        # self.assertEqual(res.status_code, 400)
 
     #GET ALL ORDERS
     # def test_get_all_orders_no_orders_saved(self):
