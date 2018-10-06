@@ -39,10 +39,11 @@ class DatabaseConnectionHelper():
                     name,
                     email,
                     phone,
-                    password) VALUES ( %s, %s, %s, %s) RETURNING id;
+                    password,
+                    admin) VALUES ( %s, %s, %s, %s, %s) RETURNING id;
             """
             self.cursor.execute(
-                query, ("Andrew.T", "andrew@a.com", "0782930481", "yurizahard"))
+                query, ("Andrew.T", "andrew@a.com", "0782930481", "yurizahard", True))
             self.connection.commit()
 
         # create menu table
