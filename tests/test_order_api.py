@@ -160,59 +160,59 @@ class OrderTest(unittest.TestCase):
 
     #GET ALL ORDERS
     # def test_get_all_orders_no_orders_saved(self):
-        """
-        test saving an order with empty customer_order param
-        """
-        res = self.client().get(self.URL+"orders/", headers=self.headers)
-        json_res_data = json.loads(res.data)
+        # """
+        # test saving an order with empty customer_order param
+        # """
+        # res = self.client().get(self.URL+"orders/", headers=self.headers)
+        # json_res_data = json.loads(res.data)
 
-        self.assertEqual(json_res_data.get('info'), "No orders placed yet")
-        self.assertEqual(res.status_code, 200)
+        # self.assertEqual(json_res_data.get('info'), "No orders placed yet")
+        # self.assertEqual(res.status_code, 200)
 
     # def test_get_all_orders(self):
-        """
-        test getting all orders
-        """
-        self.post_sample_orders()
+        # """
+        # test getting all orders
+        # """
+        # self.post_sample_orders()
 
-        res = self.client().get(self.URL+"orders/", headers=self.headers)
-        self.assertEqual(res.status_code, 200)
+        # res = self.client().get(self.URL+"orders/", headers=self.headers)
+        # self.assertEqual(res.status_code, 200)
 
     #FIND SPECIFIC ORDER
     # def test_get_specific_order(self):
-        """
-        test get specific order using order id
-        """
-        self.post_sample_orders()
+        # """
+        # test get specific order using order id
+        # """
+        # self.post_sample_orders()
 
-        res = self.client().get(self.URL+"orders/1", headers=self.headers)
-        self.assertEqual(res.status_code, 200)
+        # res = self.client().get(self.URL+"orders/1", headers=self.headers)
+        # self.assertEqual(res.status_code, 200)
 
     # def test_get_specific_order_failed(self):
-        """
-        test get specific order fail using order id
-        """
-        self.post_sample_orders()
+        # """
+        # test get specific order fail using order id
+        # """
+        # self.post_sample_orders()
 
-        res = self.client().get(self.URL+"orders/5", headers=self.headers)
-        json_res_data = json.loads(res.data)
-        self.assertEqual(json_res_data.get('error'),
-                         "No order found with id: 5")
-        self.assertEqual(res.status_code, 404)
+        # res = self.client().get(self.URL+"orders/5", headers=self.headers)
+        # json_res_data = json.loads(res.data)
+        # self.assertEqual(json_res_data.get('error'),
+        #                  "No order found with id: 5")
+        # self.assertEqual(res.status_code, 404)
 
     #STATUS UPDATE
     # def test_successful_update_order_status(self):
-        """
-        test update order_status successfully
-        """
-        self.post_sample_orders()
+        # """
+        # test update order_status successfully
+        # """
+        # self.post_sample_orders()
 
-        res = self.client().put(self.URL+"orders/1",
-                                json=dict(status='complete'), headers=self.headers)
-        json_res_data = json.loads(res.data)
-        self.assertEqual(json_res_data.get('success'),
-                         "Order status was changed successfully!")
-        self.assertEqual(res.status_code, 201)
+        # res = self.client().put(self.URL+"orders/1",
+        #                         json=dict(status='complete'), headers=self.headers)
+        # json_res_data = json.loads(res.data)
+        # self.assertEqual(json_res_data.get('success'),
+        #                  "Order status was changed successfully!")
+        # self.assertEqual(res.status_code, 201)
 
     def test_invalid_order_status_update(self):
         """
