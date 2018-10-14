@@ -42,6 +42,7 @@ class DatabaseConnectionHelper():
                     password,
                     admin) VALUES ( %s, %s, %s, %s, %s) RETURNING id;
             """
+            #FIXME: user is created but admin set to false instead of true
             self.cursor.execute(
                 query, ("Andrew.T", "andrew@a.com", "0782930481", "yurizahard", True))
             self.connection.commit()

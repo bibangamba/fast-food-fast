@@ -21,6 +21,61 @@ class Validator:
         return json_response_message
 
     @classmethod
+    def validate_place_order(cls, request_data):
+        message = {}
+        if request_data is None:
+            message['error'] = 'Missing JSON request data.'
+            message['status_code'] = 400
+            return message
+        def validate_customer_order_item(customer_order_item):
+            food = customer_order_item.get('food')
+            quantity = customer_order_item.get('quantity')
+            price = customer_order_item.get('price')
+            if food is None:
+                message['error'] = 'Missing food parameter in {}. It is required'.format(customer_order_item)
+                message['status_code'] = 400
+            elif not isinstance(food, str):
+                message['error'] = 'Food parameter must be a string. Found in {}'.format(customer_order_item)
+                message['status_code'] = 400
+            elif len(food.strip()) == 0:
+                message['error'] = 'Food parameter cannot be empty. Found in {}'.format(customer_order_item)
+                message['status_code'] = 400
+            else:
+                if quantity is None:
+                    message['error'] = 'Missing quantity parameter in {}. It is required'.format(customer_order_item)
+                    message['status_code'] = 400
+                elif not isinstance(quantity, int):
+                    message['error'] = 'Quantity parameter must be an integer. Found in {}'.format(customer_order_item)
+                    message['status_code'] = 400
+                elif quantity < 1:
+                    message['error'] = 'Quantity parameter value cannot be zero. Found in {}'.format(customer_order_item)
+                    message['status_code'] = 400
+                else:
+                    if price is None:
+                        message['error'] = 'Missing price parameter in {}. It is required'.format(customer_order_item)
+                        message['status_code'] = 400
+                    elif not isinstance(price, int):
+                        message['error'] = 'Price parameter must be an integer. Found in {}'.format(customer_order_item)
+                        message['status_code'] = 400
+                    elif price < 1:
+                        message['error'] = 'Price parameter value cannot be zero. Found in {}'.format(customer_order_item)
+                        message['status_code'] = 400
+            return message
+
+        customer_order = request_data.get('customer_order') # list of dictionaries
+        if customer_order is None:
+            message['error'] = 'Missing customer_order parameter. It is required.'
+            message['status_code'] = 400
+        elif len(customer_order) < 1:
+            message['error'] = 'Customer Order cannot be empty'
+            message['status_code'] = 400
+        else:
+            for order in customer_order:
+                validate_customer_order_item(order)
+        
+        return message
+
+    @classmethod
     def validate_register_user_data(cls, request_data):
         message = {}
         if request_data is None:
@@ -64,6 +119,9 @@ class Validator:
                 if password is None:
                     message['error'] = 'Missing password parameter. It is required.'
                     message['status_code'] = 400
+                elif confirm_password is None:
+                    message['error'] = 'Missing confirm_password parameter. It is required.'
+                    message['status_code'] = 400
                 elif not isinstance(password, str):
                     message['error'] = 'Password parameter must be a string.'
                     message['status_code'] = 400
@@ -101,26 +159,26 @@ class Validator:
         password = request_data.get('password')
 
         if email is None:
-            message['error'] = 'Missing email parameter.'
+            message['error'] = 'Missing email parameter'
             message['status_code'] = 400
         elif not isinstance(email, str):
-            message['error'] = 'Email parameter must be a string.'
+            message['error'] = 'Email parameter must be a string'
             message['status_code'] = 400
         elif len(email.strip()) == 0:
-            message['error'] = 'Email parameter cannot be empty.'
+            message['error'] = 'Email parameter cannot be empty'
             message['status_code'] = 400
         elif "@" not in email:
             message['error'] = 'Supplied email parameter is not a valid email format. Must contain an @'
             message['status_code'] = 400
         else:
             if password is None:
-                    message['error'] = 'Missing password parameter. It is required.'
+                    message['error'] = 'Missing password parameter is required'
                     message['status_code'] = 400
             elif not isinstance(password, str):
-                message['error'] = 'Password parameter must be a string.'
+                message['error'] = 'Password parameter must be a string'
                 message['status_code'] = 400
-            elif len(password) < 8:
-                message['error'] = 'Password must be 8 characters or more'
+            elif len(password) < 1:
+                message['error'] = 'Password cannot be an empty string'
                 message['status_code'] = 400
 
         return message
