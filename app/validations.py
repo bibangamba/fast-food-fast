@@ -20,37 +20,60 @@ class Validator:
                     json_response_message['status_code'] = 400
         return json_response_message
 
-    # @classmethod
-    # def validate_customer_order_content_and_values(cls, order, content_key, content_type):
-    #     json_response_message = {}
-    #     if content_key not in order:
-    #         json_response_message['message'] = {"error": "Badly foramtted customer_order. Missing "+content_key +
-    #                                             " field in {}. correct format example for 'customer_order' is: {}".format(order, customer_order_format)}
-    #         json_response_message['status_code'] = 400
-    #     else:
-    #         if content_type == 'str':
-    #             if isinstance(order.get(content_key), str):
-    #                 if str(order.get(content_key)).strip() == '':
-    #                     json_response_message['message'] = {
-    #                         "error": "customer_order["+content_key+"] value must be a non empty string"}
-    #                     json_response_message['status_code'] = 400
-    #             else:
-    #                 json_response_message['message'] = {
-    #                     "error": "customer_order["+content_key+"] value must be a string, found in {}".format(order)}
-    #                 json_response_message['status_code'] = 400
-    #         elif content_type == 'int':
-    #             if isinstance(order.get(content_key), int):
-    #                 if order.get(content_key) < 1:
-    #                     json_response_message['message'] = {
-    #                         "error": "customer_order[{}] value must be greater than 1, found in {}".format(content_key, order)}
-    #                     json_response_message['status_code'] = 400
-    #             else:
-    #                     json_response_message['message'] = {
-    #                         "error": "customer_order[{}] value must be an integer. found in {}".format(content_key, order)}
-    #                     json_response_message['status_code'] = 400
+    @classmethod
+    def validate_place_order(cls, request_data):
+        message = {}
+        if request_data is None:
+            message['error'] = 'Missing JSON request data.'
+            message['status_code'] = 400
+            return message
+        def validate_customer_order_item(customer_order_item):
+            food = customer_order_item.get('food')
+            quantity = customer_order_item.get('quantity')
+            price = customer_order_item.get('price')
+            if food is None:
+                message['error'] = 'Missing food parameter in {}. It is required'.format(customer_order_item)
+                message['status_code'] = 400
+            elif not isinstance(food, str):
+                message['error'] = 'Food parameter must be a string. Found in {}'.format(customer_order_item)
+                message['status_code'] = 400
+            elif len(food.strip()) == 0:
+                message['error'] = 'Food parameter cannot be empty. Found in {}'.format(customer_order_item)
+                message['status_code'] = 400
+            else:
+                if quantity is None:
+                    message['error'] = 'Missing quantity parameter in {}. It is required'.format(customer_order_item)
+                    message['status_code'] = 400
+                elif not isinstance(quantity, int):
+                    message['error'] = 'Quantity parameter must be an integer. Found in {}'.format(customer_order_item)
+                    message['status_code'] = 400
+                elif quantity < 1:
+                    message['error'] = 'Quantity parameter value cannot be zero. Found in {}'.format(customer_order_item)
+                    message['status_code'] = 400
+                else:
+                    if price is None:
+                        message['error'] = 'Missing price parameter in {}. It is required'.format(customer_order_item)
+                        message['status_code'] = 400
+                    elif not isinstance(price, int):
+                        message['error'] = 'Price parameter must be an integer. Found in {}'.format(customer_order_item)
+                        message['status_code'] = 400
+                    elif price < 1:
+                        message['error'] = 'Price parameter value cannot be zero. Found in {}'.format(customer_order_item)
+                        message['status_code'] = 400
+            return message
 
-    #     if len(json_response_message) > 0:
-    #         return custom_response(json_response_message.get('message'), json_response_message.get('status_code'))
+        customer_order = request_data.get('customer_order') # list of dictionaries
+        if customer_order is None:
+            message['error'] = 'Missing customer_order parameter. It is required.'
+            message['status_code'] = 400
+        elif len(customer_order) < 1:
+            message['error'] = 'Customer Order cannot be empty'
+            message['status_code'] = 400
+        else:
+            for order in customer_order:
+                validate_customer_order_item(order)
+        
+        return message
 
     @classmethod
     def validate_register_user_data(cls, request_data):
@@ -63,9 +86,10 @@ class Validator:
         email = request_data.get('email')
         name = request_data.get('name')
         password = request_data.get('password')
-        confirm_password = request_data.get('confirm_password')#can be done on the client
+        confirm_password = request_data.get(
+            'confirm_password')  # can be done on the client
         phone = request_data.get('phone')
-        
+
         #email validation
         if email is None:
             message['error'] = 'Missing email parameter. It is required.'
@@ -95,6 +119,9 @@ class Validator:
                 if password is None:
                     message['error'] = 'Missing password parameter. It is required.'
                     message['status_code'] = 400
+                elif confirm_password is None:
+                    message['error'] = 'Missing confirm_password parameter. It is required.'
+                    message['status_code'] = 400
                 elif not isinstance(password, str):
                     message['error'] = 'Password parameter must be a string.'
                     message['status_code'] = 400
@@ -117,7 +144,7 @@ class Validator:
                         message['status_code'] = 400
                     elif not phone.isdigit():
                         message['error'] = 'Phone parameter must be a digits only string.'
-                        message['status_code'] = 400 
+                        message['status_code'] = 400
         return message
 
     @classmethod
@@ -130,30 +157,30 @@ class Validator:
 
         email = request_data.get('email')
         password = request_data.get('password')
-        
+
         if email is None:
-            message['error'] = 'Missing email parameter.'
+            message['error'] = 'Missing email parameter'
             message['status_code'] = 400
         elif not isinstance(email, str):
-            message['error'] = 'Email parameter must be a string.'
+            message['error'] = 'Email parameter must be a string'
             message['status_code'] = 400
         elif len(email.strip()) == 0:
-            message['error'] = 'Email parameter cannot be empty.'
+            message['error'] = 'Email parameter cannot be empty'
             message['status_code'] = 400
         elif "@" not in email:
             message['error'] = 'Supplied email parameter is not a valid email format. Must contain an @'
             message['status_code'] = 400
         else:
             if password is None:
-                    message['error'] = 'Missing password parameter. It is required.'
+                    message['error'] = 'Missing password parameter is required'
                     message['status_code'] = 400
             elif not isinstance(password, str):
-                message['error'] = 'Password parameter must be a string.'
+                message['error'] = 'Password parameter must be a string'
                 message['status_code'] = 400
-            elif len(password) < 8:
-                message['error'] = 'Password must be 8 characters or more'
+            elif len(password) < 1:
+                message['error'] = 'Password cannot be an empty string'
                 message['status_code'] = 400
-                
+
         return message
 
     @classmethod
@@ -167,7 +194,7 @@ class Validator:
         food_name = request_data.get('food_name')
         price = request_data.get('price')
         food_description = request_data.get('food_description')
-        
+
         #food_name validation
         if food_name is None:
             message['error'] = 'Missing food_name parameter. It is required.'

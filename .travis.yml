@@ -5,15 +5,17 @@ python:
 services:
   - postgresql
 
+addons:
+    postgresql: "9.4"
+
 install:
     - pip install -r requirements.txt
 
-
+before_script:
+    - psql -c 'create database testdb;' -U postgres
 
 script:
-    - psql -c 'create database fast-food-fast-test;' -U postgres
     - python -m pytest --cov=app --cov-report term-missing
-
 
 after_success:
     - coveralls

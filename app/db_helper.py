@@ -1,7 +1,7 @@
 from app import config
 
 import psycopg2
-from psycopg2.extras import Json 
+from psycopg2.extras import Json
 from app import APP
 
 
@@ -30,6 +30,22 @@ class DatabaseConnectionHelper():
             password VARCHAR)
         """
         )
+        #add admin user if `users` table hasn't been populated yet
+        self.cursor.execute("SELECT id FROM users WHERE id = 1")
+        admin = self.cursor.fetchone()
+        if admin is None:
+            query = """
+                INSERT INTO users (
+                    name,
+                    email,
+                    phone,
+                    password,
+                    admin) VALUES ( %s, %s, %s, %s, %s) RETURNING id;
+            """
+            #FIXME: user is created but admin set to false instead of true
+            self.cursor.execute(
+                query, ("Andrew.T", "andrew@a.com", "0782930481", "yurizahard", True))
+            self.connection.commit()
 
         # create menu table
         self.cursor.execute(
@@ -51,7 +67,8 @@ class DatabaseConnectionHelper():
             customer_phone varchar(15),
             customer_order jsonb,
             order_status varchar(20),
-            order_date_utc timestamp)
+            order_date_utc timestamp,
+            user_id int)
         """
         )
 
@@ -64,13 +81,15 @@ class DatabaseConnectionHelper():
                 customer_phone,
                 customer_order,
                 order_status,
-                order_date_utc) VALUES (%s, %s, %s, %s, %s) RETURNING id;
+                order_date_utc,
+                user_id) VALUES (%s, %s, %s, %s, %s, %s) RETURNING id;
         """
         self.cursor.execute(query, (order.get('customer_name'),
                                     order.get('customer_phone'),
                                     Json(order.get('customer_order')),
                                     order.get('order_status'),
-                                    order.get('order_date')))
+                                    order.get('order_date'),
+                                    order.get('user_id')))
         self.connection.commit()
         #set id field to the id returned from insert query
         order['id'] = self.cursor.fetchone()[0]
@@ -90,6 +109,26 @@ class DatabaseConnectionHelper():
             organized_order['customer_order'] = order[3]
             organized_order['order_status'] = order[4]
             organized_order['order_date'] = order[5]
+            organized_order['user_id'] = order[5]
+            list_of_orders.append(organized_order)
+        return list_of_orders
+
+    def get_all_orders_belonging_to_user_from_db(self, user_id):
+        list_of_orders = []
+        self.cursor.execute(
+            "SELECT * FROM orders WHERE user_id = {}".format(user_id))
+        orders = self.cursor.fetchall()
+        self.connection.commit()
+
+        for order in orders:
+            organized_order = {}
+            organized_order['id'] = order[0]
+            organized_order['customer_name'] = order[1]
+            organized_order['customer_phone'] = order[2]
+            organized_order['customer_order'] = order[3]
+            organized_order['order_status'] = order[4]
+            organized_order['order_date'] = order[5]
+            organized_order['user_id'] = order[5]
             list_of_orders.append(organized_order)
         return list_of_orders
 
@@ -105,6 +144,7 @@ class DatabaseConnectionHelper():
             order_organized['customer_order'] = order[3]
             order_organized['order_status'] = order[4]
             order_organized['order_date'] = order[5]
+            order_organized['user_id'] = order[5]
             return order_organized
         else:
             return order
@@ -197,7 +237,8 @@ class DatabaseConnectionHelper():
                 organized_menu_item['id'] = menu_item[0]
                 organized_menu_item['food_name'] = menu_item[1]
                 if menu_item[2] is not None:
-                    organized_menu_item['price'] = int(menu_item[2]) #convert Decimal to int since Decimal is not JSON serializable
+                    # convert Decimal to int since Decimal is not JSON serializable
+                    organized_menu_item['price'] = int(menu_item[2])
                 organized_menu_item['food_description'] = menu_item[3]
                 list_of_menu_items.append(organized_menu_item)
         return list_of_menu_items
@@ -216,7 +257,7 @@ class DatabaseConnectionHelper():
         else:
             return menu_item
         pass
-    
+
     def find_menu_item_in_db_using_food_name(self, food_name):
         self.cursor.execute(
             "SELECT * FROM menu WHERE food_name = '{}'".format(food_name))

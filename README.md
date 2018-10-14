@@ -1,7 +1,7 @@
 # fast-food-fast
 
-[![Build Status](https://travis-ci.org/bibangamba/fast-food-fast.svg?branch=api_v2)](https://travis-ci.org/bibangamba/fast-food-fast)
-[![Coverage Status](https://coveralls.io/repos/github/bibangamba/fast-food-fast/badge.svg?branch=api_v2)](https://coveralls.io/github/bibangamba/fast-food-fast?branch=api_v2)
+[![Build Status](https://travis-ci.org/bibangamba/fast-food-fast.svg?branch=ft-place-order-endpoint-160908874)](https://travis-ci.org/bibangamba/fast-food-fast)
+[![Coverage Status](https://coveralls.io/repos/github/bibangamba/fast-food-fast/badge.svg?branch=ft-place-order-endpoint-160908874)](https://coveralls.io/github/bibangamba/fast-food-fast?branch=ft-place-order-endpoint-160908874)
 [![Maintainability](https://api.codeclimate.com/v1/badges/5c4fade3616fe64f7994/maintainability)](https://codeclimate.com/github/bibangamba/fast-food-fast/maintainability)
 
 Fast-Food-Fast is a food delivery service app for a restaurant
@@ -14,7 +14,7 @@ The ui demo for fast-food-fast can be found on [gh-pages](http://deliver4me.net/
 
 ### Heroku Link
 
-To test the api endpoints with Postman, please use this [link](https://bibangamba-fast-food-fast-api.herokuapp.com/api/v1/orders/)
+To test the api endpoints with Postman, please use this [link](https://bibangamba-fast-food-fast-v2.herokuapp.com/api/v2/menu)
 
 ## Setup
 
@@ -38,12 +38,30 @@ If however, you'd like to run the app on your local machine:
 
 ### Working with the endpoints
 
-|Endpoint                       |Method |Action                                     |Parameters                                     |
-|:---                           |:---   |:---                                       |:--                                            |
-|/api/v2/orders/                |GET    |get a list of all orders                   |N/A                                            |
-|/api/v2/orders/int:order_id    |GET    |get a specific order whose id = order_id   |order_id                                       |
-|/api/v2/orders/                |POST   |place an order                             |customer_name, customer_order, customer_contact|
-|/api/v2/orders/int:order_id    |PUT    |update an order's status                   |order_id, status                               |
+|Endpoint                       |Method |Action                                     |JSON                                          |
+|:---                           |:---   |:---                                       |:--                                           |
+|/api/v2/auth/signup            |POST   |sign up as a user                          |email, password, confirm_password, name, phone|
+|/api/v2/auth/login             |POST   |login so as to get an auth token           |email, password                               |
+|/api/v2/orders/                |GET    |get a list of all orders                   |N/A                                           |
+|/api/v2/orders/int:order_id    |GET    |get a specific order whose id = order_id   |order_id                                      |
+|/api/v2/orders/int:order_id    |PUT    |update an order's status                   |order_id, status                              |
+|/api/v2/menu/                  |POST   |add food item to the menu                  |food_name, price, food_description            |
+|/api/v2/menu/                  |GET    |get all food items on the menu             |N/A            |
+|/api/v2/users/orders/          |POST   |place an order                             |customer_order                                |
+|/api/v2/users/orders/          |GET    |get current user's order history           |N/A                                |
+
+Excluding the login and signup  endpoints, all other endpoints require an Authorizaion header e.g.
+
+`{"Authorization": "Bearer jwt-token"}`
+
+And some routes can only be accessed by admin level users.
+
+### Users
+
+|Email          |Name       |Password   |Admin  |
+|:---           |:---       |:---       |:---   |
+|andrew@a.com   |Andrew.T   |yurizahard |YES    |
+|joseph@a.com   |Joseph.H   |password   |NO     |
 
 ### Parameters description
 
