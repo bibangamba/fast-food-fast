@@ -74,7 +74,7 @@ class OrderTest(unittest.TestCase):
 
         self.assertIsNone(res.json.get('jwt_token'))
         self.assertEqual(res.json.get('error'),
-                         'Email/Password authntication failed')
+                         'Email/Password authentication failed')
         self.assertEqual(res.status_code, 401)
         # "error": "
 

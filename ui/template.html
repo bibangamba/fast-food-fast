@@ -1,0 +1,30 @@
+<!DOCTYPE <!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Template Page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" media="screen" href="{{url_for('static', filename='css/main.css')}}" />
+    <script src="{{url_for('static', filename='js/main.js')}}"></script>
+</head>
+
+<body>
+    <header>
+        <div class="header flex-container-left">
+            <div class="title-logo">
+                <h1><a href="{{url_for('menu')}}">Fast Food Fast</a></h1>
+            </div>
+            <div class="nav-links">
+                <a href="#">Menu</a>
+                <a href="#">Orders</a>
+            </div>
+        </div>
+    </header>
+    {% block content %}
+    {% endblock %}
+
+</body>
+
+</html>

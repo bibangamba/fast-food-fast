@@ -152,6 +152,7 @@ class DatabaseConnectionHelper():
     def update_order_status_in_db(self, order_id, order_status_update):
             self.cursor.execute(
                 "UPDATE orders SET order_status = '{}' WHERE id = {};".format(order_status_update, order_id))
+            self.connection.commit()
             return self.get_order_from_db(order_id)
 
     #USER RELATED

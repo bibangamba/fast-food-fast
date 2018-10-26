@@ -1,0 +1,47 @@
+<!DOCTYPE <!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Register</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" media="screen" href="{{url_for('static', filename='css/main.css')}}" />
+</head>
+
+<body class="signup-page">
+    <div class="header flex-container-left">
+        <div class="title-logo">
+            <h1><a href="#">Fast Food Fast</a></h1>
+        </div>
+
+    </div>
+    <div class="centered-div">
+        <div id="signupForm" class="user-input-form">
+            <h3>Signup</h3>
+            <form id="signupFormActual">
+                <input id="userName" type="text" name="name" placeholder="Full name" required />
+                <br>
+                <input id="userEmail" type="email" name="email" placeholder="Email address" required />
+                <br>
+                <input id="userPhone" type="text" name="phone" placeholder="Phone Number" required />              
+                <br>
+                <input id="userPassword" type="password" name="password" placeholder="Password" required />
+                <br>
+                <input id="confirmPassword" type="password" name="confirm-password" placeholder="Confirm Password" required />
+                <br>
+                <h5 id = "successFeedback" class="hide success-message">Yay, something good happened.</h5>
+                <h5 id = "errorFeedback" class="hide error-message">Sorry, something bad happened.</h5>
+                <input id="signupBtn" type="button" value="Signup">
+            </form>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>&copy 2018 Fast Food Fast</p>
+    </div>
+
+    <script src="{{url_for('static', filename='js/main.js')}}"></script>
+</body>
+
+</html>
