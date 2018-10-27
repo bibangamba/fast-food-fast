@@ -123,7 +123,7 @@ const signinPageLogic = () => {
 //SIGNOUT
 const signoutPageLogic = () => {
     localStorage.removeItem('jwt_token');
-    redirect('/signin');
+    redirect('/signin');  
 }
 
 //SIGNUP {signup}
@@ -369,7 +369,11 @@ const menuPageLogic = () => {
                 showElement(errorFeedback);
                 errorFeedback.innerHTML = response['error'];
             } else if ('info' in response) {
-                menuMainContent.innerHTML = '<h3 class="centered-text">We currently do not have anything on the menu. Please check back later.</h3>'
+                if(isAdmin(getToken())){
+                    document.getElementById('menuTableAndOrderPreview').innerHTML = "<h5>The menu is empty. Please add some food items using the link above.</h5>"
+                }else{
+                    menuMainContent.innerHTML = '<h3 class="centered-text">We currently do not have anything on the menu. Please check back later.</h3>'
+                }
                 console.debug("non-success info while loading MENU: ", response['info']);
             } else {
                 let menuArray = response;
@@ -614,6 +618,7 @@ switch (document.body.classList[0]) {
         ordersPageLogic();
         break;
     case 'signout-page':
+        console.log('ask to run signout logic')
         signoutPageLogic();
         break;
 
