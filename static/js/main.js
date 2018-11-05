@@ -1,6 +1,9 @@
+
+
 const getToken = () => localStorage.getItem('jwt_token');
 
 const parseJWT = (token) => {
+    //TODO: handle emptsy or non-existent token here i.e. redirect to signin page with good user feedback
     var base64Url = token.split('.')[1];
     //base64 has + instead of - and / instead of _ so we convert base64Url 
     //to base64 by replacing (regular expression) all occurences
@@ -133,7 +136,6 @@ const signupPageLogic = () => {
 
     signupButton.onclick = (event) => {
         event.preventDefault();
-        console.log("signup form: ", signupForm);
         signupButton.value = "Saving...";
         // disable(signupButton);
         hideElement(errorFeedback);
@@ -155,7 +157,6 @@ const signupPageLogic = () => {
                     showElement(errorFeedback);
                     errorFeedback.innerHTML = response['error'];
                 } else if ('success' in response) {
-                    console.log("response on success: ", response);
                     signupForm.reset();
                     successFeedback.innerHTML = `${name} has been registered as a user. Please <a href="/signin">signin</a>.`;
                     showElement(successFeedback);
@@ -359,13 +360,10 @@ const menuPageLogic = () => {
     getData("/api/v2/menu", getToken())
         .then(data => {
             const response = data;
-            // console.debug(response);
             if ('msg' in response) {
-                console.log("Found a message instead: ", response['msg']);
                 showElement(errorFeedback);
                 errorFeedback.innerHTML = response['msg'];
             } else if ('error' in response) {
-                console.debug("Error loading MENU", response['error']);
                 showElement(errorFeedback);
                 errorFeedback.innerHTML = response['error'];
             } else if ('info' in response) {
@@ -374,10 +372,8 @@ const menuPageLogic = () => {
                 }else{
                     menuMainContent.innerHTML = '<h3 class="centered-text">We currently do not have anything on the menu. Please check back later.</h3>'
                 }
-                console.debug("non-success info while loading MENU: ", response['info']);
             } else {
                 let menuArray = response;
-                // console.log("menuArray check: ", menuArray);
                 menuArray.forEach(appendMenuItemToTable);
             }
         })
@@ -578,16 +574,13 @@ const ordersPageLogic = () => {
     getData(url, getToken())
     .then(response => {
         if ('msg' in response) {
-            console.log("Found a message instead: ", response['msg']);
             showElement(errorFeedback);
             errorFeedback.innerHTML = response['msg'];
         } else if ('error' in response) {
-            console.debug("Error loading ORDERS", response['error']);
             showElement(errorFeedback);
             errorFeedback.innerHTML = response['error'];
         } else if ('info' in response) {
             ordersMainContent.innerHTML = '<h3 class="centered-text">Unfortunatley, no orders have been placed yet.</h3>'
-            console.debug("non-success info while loading ORDERS: ", response['info']);
         } else {
             let ordersArray = response;
             if(isAdmin(getToken())){
@@ -618,10 +611,18 @@ switch (document.body.classList[0]) {
         ordersPageLogic();
         break;
     case 'signout-page':
-        console.log('ask to run signout logic')
         signoutPageLogic();
         break;
 
     default:
         break;
 }
+
+//UI logic
+const navBarsLink = document.getElementById('navBars');
+navBarsLink.onclick = ()=>{
+    console.log('clicked nav bars, time to show the dropdown list of nav-links');
+    const header = document.getElementById('header');
+    header.classList.toggle('responsive');
+}
+
