@@ -4,9 +4,12 @@ __pycache__
 app/__pycache__
 tests/__pycache__
 api-env
+venv
 api
 bibangamba_fast_food_fast_api.egg-info
 build
 dist
 setup.py
 .env
+.idea
+requirements.1.txt
